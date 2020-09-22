@@ -1,0 +1,2170 @@
+
+
+<head>
+<title>Make an Active X DLL (Step By Step)</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#000080" vlink="#000080">
+
+<p>&nbsp;</p>
+<p><b><font face="Verdana">Making a DLL (Step by Step)</font></b></p>
+<p><font face="Verdana"><small>I got a lot of nice responses to my Make and
+ActiveX Control (which I did upon request for somebody) and one of those
+comments again requested that I make another for how to make a DLL.&nbsp; So
+here I go again.&nbsp; Once again this step by step is really just me trying to
+type (talk) through what I do when making a DLL of some sort.&nbsp; With both
+DLL's and Controls, one really must have some type of understanding of OOP
+(Object Oriented Programming) to help keep it all together and click in their
+mind.&nbsp; That I am sorry to say requires more than I can type here, so bear
+with me as I type this out.&nbsp; I hope it will at least teach something.</small></font></p>
+<p><small><font face="Verdana">Just as with my How to Make an ActiveX Control,
+this step by step will in the end give you a new DLL that I hope you find
+useful.&nbsp; We are going to make a DLL that a few different utility
+functions.&nbsp; From there you should be able to see how you can add
+more.&nbsp; In this demo I will be placing a lot of code that does certain
+things.&nbsp; I will not really take the time to explain that code, but will be
+explaining how it will be called and used.</font></small></p>
+<p><small><b><font face="Verdana">Start The DLL:</font></b></small></p>
+<p><small><font face="Verdana">Ok, time to start.&nbsp; Pretty simple, open VB
+and choose to start a new ActiveX DLL project.&nbsp; It should start you off
+with a project and one default named class.&nbsp; First click the project and
+name the project <b>COMUTIL</b>.&nbsp; This is going to become the name of the
+DLL (COMUTIL.DLL)</font></small></p>
+<p><small><font face="Verdana">Next Click on Project in then menu then COMUTIL
+Properties.</font></small></p>
+<p><small><font face="Verdana">On the first tab go to Project Description and
+enter Common Utilities.&nbsp; This is english like description is how it will be
+listed later when we try to add this DLL to any project under the References
+list.&nbsp; Under the Make Tab, I like to set the version to Auto
+Increment.&nbsp; After that, feel free to set Company, Copyright etc properties
+to the project as you see fit.&nbsp; Click OK.</font></small></p>
+<p><small><font face="Verdana">Now go click on the Class module.&nbsp; Name it
+DISPLAY.&nbsp; We are going to make a class full of Screen Type functions.</font></small></p>
+<p><small><font face="Verdana">Click Save and go ahead and save these files how
+you like to save your projects.&nbsp; Try to save in a place you will never
+move, not a scratch place, because later when you compile it will automatically
+register your new DLL at that location.&nbsp; Much easier to put it where you
+want it as opposed to moving later and reregistering it manually.</font></small></p>
+<p><small><font face="Verdana">Now go look at the rest of the properties of the
+DLL, by default since we told we are making a DLL it set the most common
+settings for this class.&nbsp; The big one to notice is the Instancing property
+for your class.&nbsp; If you were to just have a simple EXE project with a Class
+module, the only option is Private, but with DLL's (or anything ActiveX, classes
+can have other options.&nbsp; Be default the Multiuse is what we want.&nbsp; I
+could just paste the help file here explaining what all these mean, but go ahead
+and click on Instancing then press F1.&nbsp; Here you can read what the
+difference is.&nbsp; The big thing to really think about is if you want this
+code in this class available for other programs to call, it cannot be
+Private.&nbsp; Multiuse is best for what we are going to do.&nbsp; As for the
+other properties such as MTSTransactionMode go into a whole other area of discussion
+on n-Tier design and using Microsoft Transaction Server which once again would
+mean I would have to write a book.&nbsp; So lets just move on from here.</font></small></p>
+<p><small><b><font face="Verdana">Very Basic explanation of Class Modules:</font></b></small></p>
+<p><small><font face="Verdana">Ok, before I say anything, I know I may be flamed
+hard if I do not say 100% fact here, but please everybody give me a break, I am
+going to try to explain class modules in a very very simple way to help those
+who never used one.&nbsp; For those who know class modules, you can skip this
+section.</font></small></p>
+<p><small><font face="Verdana">Ok, here goes.&nbsp; We all know what variables
+are, right?&nbsp; We have our Longs, our Integers, our Strings etc.&nbsp; These
+are all basic data types.&nbsp; Each has the ability to store a value of some
+sort.&nbsp; That is all they do though, hold a value.&nbsp; Class Modules in a
+way are just a way for you to define a new data type.&nbsp; It too can hold a
+value.&nbsp; But beyond that, it can hold MANY values if you tell it how.&nbsp;
+Not only that, but you can code in logic when a value is set or read.&nbsp; You
+can also program in logic to manipulate the data or do just about
+anything.&nbsp; You can even put in functions and subs into a class and if coded
+correctly, when this class is used later by having a variable declared off of
+it, that variable can call those functions.&nbsp; Those functions, and subs, and
+values that you have in your class can either be private or public.&nbsp; If
+private, only that class can talk to that part of the code, if Public, then any
+variable based off of the class can talk to it.&nbsp; You have dealt with class
+modules all the time.&nbsp; Forms are classes modules.&nbsp; When you make a
+class, any part of it that just holds a value that can be read or set is what is
+known as a Property.&nbsp; Any function or sub you add to a class becomes known
+as a Method.&nbsp; So, with a form.&nbsp; It has properties:&nbsp; Caption,
+Width, Height, BorderStyle, etc.&nbsp; It also has methods: Show, Hide, Refresh
+etc.&nbsp; As you see, properties are things that hold values, methods are
+things that perform action.&nbsp; In code you can declare a variable based on a
+form because a form is a class.&nbsp; Dim frm as Form1.&nbsp; There the frm
+variable can now be used to talk to an &quot;instance&quot; of Form1.&nbsp; Note
+how I said instance.&nbsp; Unlike standard variable types,&nbsp; just declaring
+a variable of that type does not get it ready to use.&nbsp; It has to be instantiated
+(actually put into memory and ready for use).&nbsp; If you used ADO then you
+have done this before (ADO is a DLL and Recordsets are a class in that
+DLL).&nbsp; For example.</font></small></p>
+<p><small><font face="Courier New" color="#000080"><small>Dim rs as
+ADODB.RecordSet<br>
+Set rs = New ADODB.RecordSet</small></font></small></p>
+<p><small><font face="Verdana">The first line only tells the compiler to prepare
+to use a recordset but it really does nothing but check to make sure you are
+using it right.&nbsp; The next line actually put the variable into memory.&nbsp;
+The reason behind this is because class modules allow you to add code to them
+for when they first get instantiated.&nbsp; In the C++ world they call it the
+Constructor.&nbsp; In VB it is the Class_Initialize event of the class.&nbsp;
+This event is fired when the NEW keyword is used to instantiate the class.&nbsp;
+A typical use of this event is to preset (initialize) some variables to 0 or 1
+or whatever.</font></small></p>
+<p><small><font face="Verdana">I hope you are all still with me.&nbsp; This is
+not really easy to explain.&nbsp; Usually just takes practice.</font></small></p>
+<p><small><font face="Verdana">Once a variable decalred off your class is
+instaciated, you can now call any public piece of that class using the dot (.)
+operator.&nbsp; You do this all the time.&nbsp; Like Me.Caption=&quot;My
+Caption&quot;&nbsp; See the dot.&nbsp; Me refers to the form (which is a class)
+then the .&nbsp; then Caption which refers to a public property of that
+class.&nbsp;&nbsp;</font></small></p>
+<p><small><font face="Verdana">Ok, that is just some background, keep all that
+in mind then lets get started and I will try to refer back to show you how it
+applies.&nbsp; I hope.</font></small></p>
+<p><small><b><font face="Verdana">Start Coding:</font></b></small></p>
+<p><small><font face="Verdana">Ok, open up the code window for our class we
+called DISPLAY.&nbsp; Now here is some code to copy and paste in:</font></small></p>
+<p><small><font face="Courier New" color="#000080"><small>Public Enum MeasureType<br>
+&nbsp;&nbsp;&nbsp; mt_TWIPS = 0<br>
+&nbsp;&nbsp;&nbsp; mt_PIXEL = 1<br>
+End Enum</small></font></small></p>
+<p><small><font face="Verdana">Paste that up in the General Declarations section
+of the class.</font></small></p>
+<p><small><font face="Verdana">Some of our code later will provide ways to get
+measurements of the screen and that is there to provide options during the call
+as to what type of measurement.&nbsp; If you have never used Enums before,
+Please look them up in the help file.</font></small></p>
+<p><small><font face="Verdana">Now paste in these to functions.</font></small></p>
+<p><small><font face="Courier New" color="#000080"><small>Public Function GetScreenWidth(Optional plngMeasure As MeasureType = mt_TWIPS) As Long<br>
+&nbsp;&nbsp;&nbsp; On Error GoTo ErrorGetScreenWidth<br>
+&nbsp;&nbsp;&nbsp; Select Case plngMeasure<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case mt_PIXEL<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GetScreenWidth = SCREEN.Width / SCREEN.TwipsPerPixelX<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case mt_TWIPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GetScreenWidth = SCREEN.Width<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GetScreenWidth = 0<br>
+&nbsp;&nbsp;&nbsp; End Select<br>
+&nbsp;&nbsp;&nbsp; Exit Function<br>
+ErrorGetScreenWidth:<br>
+&nbsp;&nbsp;&nbsp; GetScreenWidth = 0<br>
+&nbsp;&nbsp;&nbsp; MsgBox Err &amp; ":Error in GetScreenWidth.  Error Message: " &amp; Err.Description, vbCritical, "Warning"<br>
+&nbsp;&nbsp;&nbsp; Exit Function<br>
+End Function<br>
+Public Function GetScreenHeight(Optional plngMeasure As MeasureType = mt_TWIPS) As Long<br>
+&nbsp;&nbsp;&nbsp; On Error GoTo ErrorGetScreenHeight<br>
+&nbsp;&nbsp;&nbsp; Select Case plngMeasure<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case mt_PIXEL<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GetScreenHeight = SCREEN.Height / SCREEN.TwipsPerPixelY<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case mt_TWIPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GetScreenHeight = SCREEN.Height<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GetScreenHeight = 0<br>
+&nbsp;&nbsp;&nbsp; End Select<br>
+&nbsp;&nbsp;&nbsp; Exit Function<br>
+GetScreenHeight:<br>
+&nbsp;&nbsp;&nbsp; GetScreenHeight = 0<br>
+&nbsp;&nbsp;&nbsp; MsgBox Err &amp; ":Error in GetScreenHeight.  Error Message: " &amp; Err.Description, vbCritical, "Warning"<br>
+&nbsp;&nbsp;&nbsp; Exit Function<br>
+End Function</small></font></small></p>
+<p><small><font face="Verdana">These two functions have been declared as Public
+and therefore later when we use our DLL and make a variable off this DISPLAY
+Class, we can call them.&nbsp; They are both pretty simple functions, I just
+need to fill this class in with something to teach don't I.&nbsp; Now in
+thinking what else we can add to this class, we need to try to focus on what is
+relevant to the Display.&nbsp; For the most part you want to make a class
+specific in nature (you don't have to, but that is the point).&nbsp; Each class
+should deal with a certain topic/functionality.&nbsp; For example.&nbsp; A class
+for DISPLAY, a class for ENCRYPTION, a class for SOUND, etc.&nbsp; You get the
+idea.&nbsp; In each class you code only things relevant to that class.&nbsp;
+Also, classes are also supposed to be coded that they only need themselves to
+work, or expect data to be past to them to work.&nbsp; They should NOT rely on a
+global variable someplace in your project to work.&nbsp; The point around a
+class is that it is self contained and can work when put into any project (also
+know as Encapsulation).</font></small></p>
+<p><small><font face="Verdana">Now, lets add some code that will do a screen
+capture for us.&nbsp; This code is long but go ahead and copy and paste it
+in.&nbsp; When you paste, pasted it right after the Enum&nbsp; you made earlier
+and before those other two functions:</font></small></p>
+<p><small><font face="Courier New" color="#000080"><small>Private Const CCHDEVICENAME = 32<br>
+Private Const CCHFORMNAME = 32<br>
+Public FileName As String<br>
+Private Type RECT<br>
+&nbsp;&nbsp;&nbsp; Left As Long<br>
+&nbsp;&nbsp;&nbsp; Top As Long<br>
+&nbsp;&nbsp;&nbsp; Right As Long<br>
+&nbsp;&nbsp;&nbsp; Bottom As Long<br>
+End Type<br>
+Private Type DEVMODE<br>
+&nbsp;&nbsp;&nbsp; dmDeviceName As String * CCHDEVICENAME<br>
+&nbsp;&nbsp;&nbsp; dmSpecVersion As Integer<br>
+&nbsp;&nbsp;&nbsp; dmDriverVersion As Integer<br>
+&nbsp;&nbsp;&nbsp; dmSize As Integer<br>
+&nbsp;&nbsp;&nbsp; dmDriverExtra As Integer<br>
+&nbsp;&nbsp;&nbsp; dmFields As Long<br>
+&nbsp;&nbsp;&nbsp; dmOrientation As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPaperSize As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPaperLength As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPaperWidth As Integer<br>
+&nbsp;&nbsp;&nbsp; dmScale As Integer<br>
+&nbsp;&nbsp;&nbsp; dmCopies As Integer<br>
+&nbsp;&nbsp;&nbsp; dmDefaultSource As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPrintQuality As Integer<br>
+&nbsp;&nbsp;&nbsp; dmColor As Integer<br>
+&nbsp;&nbsp;&nbsp; dmDuplex As Integer<br>
+&nbsp;&nbsp;&nbsp; dmYResolution As Integer<br>
+&nbsp;&nbsp;&nbsp; dmTTOption As Integer<br>
+&nbsp;&nbsp;&nbsp; dmCollate As Integer<br>
+&nbsp;&nbsp;&nbsp; dmFormName As String * CCHFORMNAME<br>
+&nbsp;&nbsp;&nbsp; dmUnusedPadding As Integer<br>
+&nbsp;&nbsp;&nbsp; dmBitsPerPel As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPelsWidth As Long<br>
+&nbsp;&nbsp;&nbsp; dmPelsHeight As Long<br>
+&nbsp;&nbsp;&nbsp; dmDisplayFlags As Long<br>
+&nbsp;&nbsp;&nbsp; dmDisplayFrequency As Long<br>
+End Type<br>
+Private Declare Function GetWindowRect Lib "user32" (ByVal hwnd As Long, lpRect As RECT) As Long<br>
+Private Declare Function ReleaseDC Lib "user32" (ByVal hwnd As Long, ByVal hdc As Long) As Long<br>
+Private Declare Function OpenClipboard Lib "user32" (ByVal hwnd As Long) As Long<br>
+Private Declare Function EmptyClipboard Lib "user32" () As Long<br>
+Private Declare Function SetClipboardData Lib "user32" (ByVal wFormat As Long, ByVal hMem As Long) As Long<br>
+Private Declare Function CloseClipboard Lib "user32" () As Long<br>
+Private Declare Function SelectObject Lib "gdi32" (ByVal hdc As Long, ByVal hObject As Long) As Long<br>
+Private Declare Function DeleteDC Lib "gdi32" (ByVal hdc As Long) As Long<br>
+Private Declare Function BitBlt Lib "gdi32" (ByVal hDestDC As Long, ByVal x As Long, ByVal y As Long, ByVal nWidth As Long, ByVal nHeight As Long, ByVal hSrcDC As Long, ByVal xSrc As Long, ByVal ySrc As Long, ByVal dwRop As Long) As Long<br>
+Private Declare Function CreateDC Lib "gdi32" Alias "CreateDCA" (ByVal lpDriverName As String, ByVal lpDeviceName As String, ByVal lpOutput As String, lpInitData As DEVMODE) As Long<br>
+Private Declare Function CreateCompatibleBitmap Lib "gdi32" (ByVal hdc As Long, ByVal nWidth As Long, ByVal nHeight As Long) As Long<br>
+Private Declare Function CreateCompatibleDC Lib "gdi32" (ByVal hdc As Long) As Long<br>
+Private Sub ScrnCap(Lt, Top, Rt, Bot)<br>
+&nbsp;&nbsp;&nbsp; On Error GoTo ErrorScrnCap<br>
+&nbsp;&nbsp;&nbsp; Dim rWIDTH As Long, rHEIGHT As Long<br>
+&nbsp;&nbsp;&nbsp; Dim SourceDC As Long, DestDC As Long, bHANDLE As Long, Wnd As Long<br>
+&nbsp;&nbsp;&nbsp; Dim dHANDLE As Long, dm As DEVMODE<br>
+&nbsp;&nbsp;&nbsp; rWIDTH = Rt - Lt<br>
+&nbsp;&nbsp;&nbsp; rHEIGHT = Bot - Top<br>
+&nbsp;&nbsp;&nbsp; SourceDC = CreateDC("DISPLAY", 0&amp;, 0&amp;, dm)<br>
+&nbsp;&nbsp;&nbsp; DestDC = CreateCompatibleDC(SourceDC)<br>
+&nbsp;&nbsp;&nbsp; bHANDLE = CreateCompatibleBitmap(SourceDC, rWIDTH, rHEIGHT)<br>
+&nbsp;&nbsp;&nbsp; SelectObject DestDC, bHANDLE<br>
+&nbsp;&nbsp;&nbsp; BitBlt DestDC, 0, 0, rWIDTH, rHEIGHT, SourceDC, Lt, Top, &amp;HCC0020<br>
+&nbsp;&nbsp;&nbsp; Wnd = 0<br>
+&nbsp;&nbsp;&nbsp; OpenClipboard Wnd<br>
+&nbsp;&nbsp;&nbsp; EmptyClipboard<br>
+&nbsp;&nbsp;&nbsp; SetClipboardData 2, bHANDLE<br>
+&nbsp;&nbsp;&nbsp; CloseClipboard<br>
+&nbsp;&nbsp;&nbsp; DeleteDC DestDC<br>
+&nbsp;&nbsp;&nbsp; ReleaseDC dHANDLE, SourceDC<br>
+&nbsp;&nbsp;&nbsp; Exit Sub<br>
+ErrorScrnCap:<br>
+&nbsp;&nbsp;&nbsp; MsgBox Err &amp; ":Error in ScrnCap().  Error Message:" &amp; Err.Description, vbCritical, "Warning"<br>
+&nbsp;&nbsp;&nbsp; Exit Sub<br>
+End Sub<br>
+Public Sub Capture(control_hWnd As Long, Optional fNAME As String = "")<br>
+&nbsp;&nbsp;&nbsp; On Error GoTo ErrorCapture<br>
+&nbsp;&nbsp;&nbsp; Dim sp As RECT, x As Long<br>
+&nbsp;&nbsp;&nbsp; If fNAME = "" Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fNAME = Me.FileName<br>
+&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Me.FileName = fNAME<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; If Me.FileName &lt;> "" Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; x = GetWindowRect(control_hWnd, sp)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ScrnCap sp.Left, sp.Top, sp.Right, sp.Bottom<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SavePicture Clipboard.GetData, Me.FileName<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; Exit Sub<br>
+ErrorCapture:<br>
+&nbsp;&nbsp;&nbsp; MsgBox Err &amp; ":Error in Caputre().  Error Message:" &amp; Err.Description, vbCritical, "Warning"<br>
+&nbsp;&nbsp;&nbsp; Exit Sub<br>
+End Sub</small></font></small></p>
+<p><small><font face="Verdana">Ok, first off, I did not write this code, I found
+it years ago.&nbsp; I did tweak it a bit but please don't ask what all of it
+does or ask questions of why did you do it that way.&nbsp; All I know is it
+works.&nbsp; If you find a way to streamline it, feel free to email me with the
+changes.&nbsp; But back to the lesson.</font></small></p>
+<p><small><font face="Verdana">Ok, we added some API calls some constants, and a
+Public Sub and a Private Sub.&nbsp; Also we added one Public Variable at the top
+named FileName.</font></small></p>
+<p><small><font face="Verdana">So, of all that code, only FileName and Capture
+are going to be available to any outside calls to this class.&nbsp; In general
+of how this code works is, when Capture is called, it is passed a hWnd (window
+handle) of what to capture, it can be a control hWnd like cmdOK.hWnd.&nbsp; A
+form handle like Me.hWnd, or the desktop window handle that you get from an API
+call.&nbsp;&nbsp; The Capture Sub also wants a file name as an argument, but if
+left blank it will attempt to ready the property FileName made public
+above.&nbsp; If one is passed it will assign it to the Public Property FileName.&nbsp;&nbsp;&nbsp;
+If it has a hWnd and a FileName then it will call ScrCap which that Sub does API
+calls to capture the rectangle which defines that hWnd and saves it to the
+clipboard.&nbsp; then Capture will take the contents of the clipboard and save
+it to a file.&nbsp; You can alter this a bit if you want that if no file name is
+present you can just still capture but save it to the clipboard buy anyhow...</font></small></p>
+<p><small><font face="Verdana">Now, I think that should be enough for this
+class.&nbsp; Click save.</font></small></p>
+<p><small><font face="Verdana">Ok,&nbsp; up to Project in the menu, then click
+Add Class Module.&nbsp; A new class module should be there.&nbsp; Name it
+DIALOG.&nbsp; Now here is TONS of code to using the Common Dialog Control
+without having to reference it nor put it on a form.&nbsp; You can just call it
+directly no matter what version they have.&nbsp; Once again, I did not write
+this code, just found it on the web, but I just LOVE this class so I thought I
+would put in in here.</font></small></p>
+<p><small><font face="Verdana">Now normally I hate Utility Type DLLs that try to
+put everything under the sun in them.&nbsp; I would never really make this DLL
+with DISPLAY and DIALOG both in the same DLL.&nbsp; The reason why is lets say
+you make a DLL with all your favorite functions.&nbsp; String Manipulation, math
+routines, display stuff, database stuff etc.&nbsp; Then you make one HUGE DLL
+out of it.&nbsp; Now lets say you give it to me and I have a project that you
+have one function I need.&nbsp; Why do I want to include all that baggage with
+my program just to get that one call.&nbsp; Keep DLLs defined very narrowly to
+one task just as you do with your classes.&nbsp; A lot of times you will only
+have one class.&nbsp; An example of when to have a lot of classes is lets say
+you have a database project.&nbsp; You make a class to talk to each table.&nbsp;
+One DLL is just fine in my eyes because it totally is defined to work with one
+particular database.&nbsp; All the classes in it are organized by table.&nbsp;
+Very logical.</font></small></p>
+<p><small><font face="Verdana">Ok, here is the Code to paste in to the DIALOG
+class we made (make sure it is set to Multiuse as well:</font></small></p>
+<p><small><font face="Courier New" color="#000080"><small>Option Explicit<br>
+' ==========================================================================<br>
+' API declares:<br>
+' ==========================================================================<br>
+Public Enum EErrorCommonDialog<br>
+&nbsp;&nbsp;&nbsp; eeBaseCommonDialog = 13450&nbsp; ' CommonDialog<br>
+End Enum<br>
+<br>
+Private Declare Function lstrlen Lib &quot;kernel32&quot; Alias &quot;lstrlenA&quot;
+(ByVal lpString As String) As Long<br>
+Private Declare Function GlobalAlloc Lib &quot;kernel32&quot; (ByVal wFlags As
+Long, ByVal dwBytes As Long) As Long<br>
+Private Declare Function GlobalCompact Lib &quot;kernel32&quot; (ByVal dwMinFree
+As Long) As Long<br>
+Private Declare Function GlobalFree Lib &quot;kernel32&quot; (ByVal hMem As
+Long) As Long<br>
+Private Declare Function GlobalLock Lib &quot;kernel32&quot; (ByVal hMem As
+Long) As Long<br>
+Private Declare Function GlobalReAlloc Lib &quot;kernel32&quot; (ByVal hMem As
+Long, ByVal dwBytes As Long, ByVal wFlags As Long) As Long<br>
+Private Declare Function GlobalSize Lib &quot;kernel32&quot; (ByVal hMem As
+Long) As Long<br>
+Private Declare Function GlobalUnlock Lib &quot;kernel32&quot; (ByVal hMem As
+Long) As Long<br>
+Private Declare Sub CopyMemoryStr Lib &quot;kernel32&quot; Alias &quot;RtlMoveMemory&quot;
+( _<br>
+&nbsp;&nbsp;&nbsp; lpvDest As Any, ByVal lpvSource As String, ByVal cbCopy As
+Long)<br>
+<br>
+Private Const MAX_PATH = 260<br>
+Private Const MAX_FILE = 260<br>
+<br>
+Private Type OPENFILENAME<br>
+&nbsp;&nbsp;&nbsp; lStructSize As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Filled with UDT
+size<br>
+&nbsp;&nbsp;&nbsp; hWndOwner As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Tied to
+Owner<br>
+&nbsp;&nbsp;&nbsp; hInstance As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Ignored
+(used only by templates)<br>
+&nbsp;&nbsp;&nbsp; lpstrFilter As
+String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Tied to Filter<br>
+&nbsp;&nbsp;&nbsp; lpstrCustomFilter As String&nbsp; ' Ignored (exercise for
+reader)<br>
+&nbsp;&nbsp;&nbsp; nMaxCustFilter As Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '
+Ignored (exercise for reader)<br>
+&nbsp;&nbsp;&nbsp; nFilterIndex As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Tied to FilterIndex<br>
+&nbsp;&nbsp;&nbsp; lpstrFile As
+String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Tied to FileName<br>
+&nbsp;&nbsp;&nbsp; nMaxFile As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '
+Handled internally<br>
+&nbsp;&nbsp;&nbsp; lpstrFileTitle As String&nbsp;&nbsp;&nbsp;&nbsp; ' Tied to
+FileTitle<br>
+&nbsp;&nbsp;&nbsp; nMaxFileTitle As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Handled internally<br>
+&nbsp;&nbsp;&nbsp; lpstrInitialDir As String&nbsp;&nbsp;&nbsp; ' Tied to InitDir<br>
+&nbsp;&nbsp;&nbsp; lpstrTitle As
+String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Tied to DlgTitle<br>
+&nbsp;&nbsp;&nbsp; flags As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Tied to Flags<br>
+&nbsp;&nbsp;&nbsp; nFileOffset As Integer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '
+Ignored (exercise for reader)<br>
+&nbsp;&nbsp;&nbsp; nFileExtension As Integer&nbsp;&nbsp;&nbsp; ' Ignored
+(exercise for reader)<br>
+&nbsp;&nbsp;&nbsp; lpstrDefExt As
+String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Tied to DefaultExt<br>
+&nbsp;&nbsp;&nbsp; lCustData As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Ignored
+(needed for hooks)<br>
+&nbsp;&nbsp;&nbsp; lpfnHook As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '
+Ignored (good luck with hooks)<br>
+&nbsp;&nbsp;&nbsp; lpTemplateName As Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '
+Ignored (good luck with templates)<br>
+End Type<br>
+<br>
+Private Declare Function GetOpenFileName Lib &quot;COMDLG32&quot; _<br>
+&nbsp;&nbsp;&nbsp; Alias &quot;GetOpenFileNameA&quot; (file As OPENFILENAME) As
+Long<br>
+Private Declare Function GetSaveFileName Lib &quot;COMDLG32&quot; _<br>
+&nbsp;&nbsp;&nbsp; Alias &quot;GetSaveFileNameA&quot; (file As OPENFILENAME) As
+Long<br>
+Private Declare Function GetFileTitle Lib &quot;COMDLG32&quot; _<br>
+&nbsp;&nbsp;&nbsp; Alias &quot;GetFileTitleA&quot; (ByVal szFile As String, _<br>
+&nbsp;&nbsp;&nbsp; ByVal szTitle As String, ByVal cbBuf As Long) As Long<br>
+<br>
+Public Enum EOpenFile<br>
+&nbsp;&nbsp;&nbsp; OFN_READONLY = &amp;H1<br>
+&nbsp;&nbsp;&nbsp; OFN_OVERWRITEPROMPT = &amp;H2<br>
+&nbsp;&nbsp;&nbsp; OFN_HIDEREADONLY = &amp;H4<br>
+&nbsp;&nbsp;&nbsp; OFN_NOCHANGEDIR = &amp;H8<br>
+&nbsp;&nbsp;&nbsp; OFN_SHOWHELP = &amp;H10<br>
+&nbsp;&nbsp;&nbsp; OFN_ENABLEHOOK = &amp;H20<br>
+&nbsp;&nbsp;&nbsp; OFN_ENABLETEMPLATE = &amp;H40<br>
+&nbsp;&nbsp;&nbsp; OFN_ENABLETEMPLATEHANDLE = &amp;H80<br>
+&nbsp;&nbsp;&nbsp; OFN_NOVALIDATE = &amp;H100<br>
+&nbsp;&nbsp;&nbsp; OFN_ALLOWMULTISELECT = &amp;H200<br>
+&nbsp;&nbsp;&nbsp; OFN_EXTENSIONDIFFERENT = &amp;H400<br>
+&nbsp;&nbsp;&nbsp; OFN_PATHMUSTEXIST = &amp;H800<br>
+&nbsp;&nbsp;&nbsp; OFN_FILEMUSTEXIST = &amp;H1000<br>
+&nbsp;&nbsp;&nbsp; OFN_CREATEPROMPT = &amp;H2000<br>
+&nbsp;&nbsp;&nbsp; OFN_SHAREAWARE = &amp;H4000<br>
+&nbsp;&nbsp;&nbsp; OFN_NOREADONLYRETURN = &amp;H8000<br>
+&nbsp;&nbsp;&nbsp; OFN_NOTESTFILECREATE = &amp;H10000<br>
+&nbsp;&nbsp;&nbsp; OFN_NONETWORKBUTTON = &amp;H20000<br>
+&nbsp;&nbsp;&nbsp; OFN_NOLONGNAMES = &amp;H40000<br>
+&nbsp;&nbsp;&nbsp; OFN_EXPLORER = &amp;H80000<br>
+&nbsp;&nbsp;&nbsp; OFN_NODEREFERENCELINKS = &amp;H100000<br>
+&nbsp;&nbsp;&nbsp; OFN_LONGNAMES = &amp;H200000<br>
+End Enum<br>
+<br>
+Private Type TCHOOSECOLOR<br>
+&nbsp;&nbsp;&nbsp; lStructSize As Long<br>
+&nbsp;&nbsp;&nbsp; hWndOwner As Long<br>
+&nbsp;&nbsp;&nbsp; hInstance As Long<br>
+&nbsp;&nbsp;&nbsp; rgbResult As Long<br>
+&nbsp;&nbsp;&nbsp; lpCustColors As Long<br>
+&nbsp;&nbsp;&nbsp; flags As Long<br>
+&nbsp;&nbsp;&nbsp; lCustData As Long<br>
+&nbsp;&nbsp;&nbsp; lpfnHook As Long<br>
+&nbsp;&nbsp;&nbsp; lpTemplateName As Long<br>
+End Type<br>
+<br>
+Private Declare Function ChooseColor Lib &quot;COMDLG32.DLL&quot; _<br>
+&nbsp;&nbsp;&nbsp; Alias &quot;ChooseColorA&quot; (Color As TCHOOSECOLOR) As
+Long<br>
+<br>
+Public Enum EChooseColor<br>
+&nbsp;&nbsp;&nbsp; CC_RGBInit = &amp;H1<br>
+&nbsp;&nbsp;&nbsp; CC_FullOpen = &amp;H2<br>
+&nbsp;&nbsp;&nbsp; CC_PreventFullOpen = &amp;H4<br>
+&nbsp;&nbsp;&nbsp; CC_ColorShowHelp = &amp;H8<br>
+' Win95 only<br>
+&nbsp;&nbsp;&nbsp; CC_SolidColor = &amp;H80<br>
+&nbsp;&nbsp;&nbsp; CC_AnyColor = &amp;H100<br>
+' End Win95 only<br>
+&nbsp;&nbsp;&nbsp; CC_ENABLEHOOK = &amp;H10<br>
+&nbsp;&nbsp;&nbsp; CC_ENABLETEMPLATE = &amp;H20<br>
+&nbsp;&nbsp;&nbsp; CC_EnableTemplateHandle = &amp;H40<br>
+End Enum<br>
+Private Declare Function GetSysColor Lib &quot;user32&quot; (ByVal nIndex As
+Long) As Long<br>
+<br>
+Private Type TCHOOSEFONT<br>
+&nbsp;&nbsp;&nbsp; lStructSize As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Filled with UDT size<br>
+&nbsp;&nbsp;&nbsp; hWndOwner As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Caller's
+window handle<br>
+&nbsp;&nbsp;&nbsp; hdc As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Printer DC/IC or NULL<br>
+&nbsp;&nbsp;&nbsp; lpLogFont As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Pointer to
+LOGFONT<br>
+&nbsp;&nbsp;&nbsp; iPointSize As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' 10 * size in points
+of font<br>
+&nbsp;&nbsp;&nbsp; flags As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Type flags<br>
+&nbsp;&nbsp;&nbsp; rgbColors As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Returned text
+color<br>
+&nbsp;&nbsp;&nbsp; lCustData As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Data passed
+to hook function<br>
+&nbsp;&nbsp;&nbsp; lpfnHook As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Pointer
+to hook function<br>
+&nbsp;&nbsp;&nbsp; lpTemplateName As Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Custom
+template name<br>
+&nbsp;&nbsp;&nbsp; hInstance As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Instance
+handle for template<br>
+&nbsp;&nbsp;&nbsp; lpszStyle As
+String&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Return style field<br>
+&nbsp;&nbsp;&nbsp; nFontType As
+Integer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Font type bits<br>
+&nbsp;&nbsp;&nbsp; iAlign As
+Integer&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Filler<br>
+&nbsp;&nbsp;&nbsp; nSizeMin As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Minimum
+point size allowed<br>
+&nbsp;&nbsp;&nbsp; nSizeMax As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Maximum
+point size allowed<br>
+End Type<br>
+Private Declare Function ChooseFont Lib &quot;COMDLG32&quot; _<br>
+&nbsp;&nbsp;&nbsp; Alias &quot;ChooseFontA&quot; (chfont As TCHOOSEFONT) As Long<br>
+<br>
+Private Const LF_FACESIZE = 32<br>
+Private Type LOGFONT<br>
+&nbsp;&nbsp;&nbsp; lfHeight As Long<br>
+&nbsp;&nbsp;&nbsp; lfWidth As Long<br>
+&nbsp;&nbsp;&nbsp; lfEscapement As Long<br>
+&nbsp;&nbsp;&nbsp; lfOrientation As Long<br>
+&nbsp;&nbsp;&nbsp; lfWeight As Long<br>
+&nbsp;&nbsp;&nbsp; lfItalic As Byte<br>
+&nbsp;&nbsp;&nbsp; lfUnderline As Byte<br>
+&nbsp;&nbsp;&nbsp; lfStrikeOut As Byte<br>
+&nbsp;&nbsp;&nbsp; lfCharSet As Byte<br>
+&nbsp;&nbsp;&nbsp; lfOutPrecision As Byte<br>
+&nbsp;&nbsp;&nbsp; lfClipPrecision As Byte<br>
+&nbsp;&nbsp;&nbsp; lfQuality As Byte<br>
+&nbsp;&nbsp;&nbsp; lfPitchAndFamily As Byte<br>
+&nbsp;&nbsp;&nbsp; lfFaceName(LF_FACESIZE) As Byte<br>
+End Type<br>
+<br>
+Public Enum EChooseFont<br>
+&nbsp;&nbsp;&nbsp; CF_ScreenFonts = &amp;H1<br>
+&nbsp;&nbsp;&nbsp; CF_PrinterFonts = &amp;H2<br>
+&nbsp;&nbsp;&nbsp; CF_BOTH = &amp;H3<br>
+&nbsp;&nbsp;&nbsp; CF_FontShowHelp = &amp;H4<br>
+&nbsp;&nbsp;&nbsp; CF_UseStyle = &amp;H80<br>
+&nbsp;&nbsp;&nbsp; CF_EFFECTS = &amp;H100<br>
+&nbsp;&nbsp;&nbsp; CF_AnsiOnly = &amp;H400<br>
+&nbsp;&nbsp;&nbsp; CF_NoVectorFonts = &amp;H800<br>
+&nbsp;&nbsp;&nbsp; CF_NoOemFonts = CF_NoVectorFonts<br>
+&nbsp;&nbsp;&nbsp; CF_NoSimulations = &amp;H1000<br>
+&nbsp;&nbsp;&nbsp; CF_LimitSize = &amp;H2000<br>
+&nbsp;&nbsp;&nbsp; CF_FixedPitchOnly = &amp;H4000<br>
+&nbsp;&nbsp;&nbsp; CF_WYSIWYG = &amp;H8000&nbsp; ' Must also have ScreenFonts
+And PrinterFonts<br>
+&nbsp;&nbsp;&nbsp; CF_ForceFontExist = &amp;H10000<br>
+&nbsp;&nbsp;&nbsp; CF_ScalableOnly = &amp;H20000<br>
+&nbsp;&nbsp;&nbsp; CF_TTOnly = &amp;H40000<br>
+&nbsp;&nbsp;&nbsp; CF_NoFaceSel = &amp;H80000<br>
+&nbsp;&nbsp;&nbsp; CF_NoStyleSel = &amp;H100000<br>
+&nbsp;&nbsp;&nbsp; CF_NoSizeSel = &amp;H200000<br>
+&nbsp;&nbsp;&nbsp; ' Win95 only<br>
+&nbsp;&nbsp;&nbsp; CF_SelectScript = &amp;H400000<br>
+&nbsp;&nbsp;&nbsp; CF_NoScriptSel = &amp;H800000<br>
+&nbsp;&nbsp;&nbsp; CF_NoVertFonts = &amp;H1000000<br>
+<br>
+&nbsp;&nbsp;&nbsp; CF_InitToLogFontStruct = &amp;H40<br>
+&nbsp;&nbsp;&nbsp; CF_Apply = &amp;H200<br>
+&nbsp;&nbsp;&nbsp; CF_EnableHook = &amp;H8<br>
+&nbsp;&nbsp;&nbsp; CF_EnableTemplate = &amp;H10<br>
+&nbsp;&nbsp;&nbsp; CF_EnableTemplateHandle = &amp;H20<br>
+&nbsp;&nbsp;&nbsp; CF_FontNotSupported = &amp;H238<br>
+End Enum<br>
+<br>
+' These are extra nFontType bits that are added to what is returned to the<br>
+' EnumFonts callback routine<br>
+<br>
+Public Enum EFontType<br>
+&nbsp;&nbsp;&nbsp; Simulated_FontType = &amp;H8000<br>
+&nbsp;&nbsp;&nbsp; Printer_FontType = &amp;H4000<br>
+&nbsp;&nbsp;&nbsp; Screen_FontType = &amp;H2000<br>
+&nbsp;&nbsp;&nbsp; Bold_FontType = &amp;H100<br>
+&nbsp;&nbsp;&nbsp; Italic_FontType = &amp;H200<br>
+&nbsp;&nbsp;&nbsp; Regular_FontType = &amp;H400<br>
+End Enum<br>
+<br>
+Private Type TPRINTDLG<br>
+&nbsp;&nbsp;&nbsp; lStructSize As Long<br>
+&nbsp;&nbsp;&nbsp; hWndOwner As Long<br>
+&nbsp;&nbsp;&nbsp; hDevMode As Long<br>
+&nbsp;&nbsp;&nbsp; hDevNames As Long<br>
+&nbsp;&nbsp;&nbsp; hdc As Long<br>
+&nbsp;&nbsp;&nbsp; flags As Long<br>
+&nbsp;&nbsp;&nbsp; nFromPage As Integer<br>
+&nbsp;&nbsp;&nbsp; nToPage As Integer<br>
+&nbsp;&nbsp;&nbsp; nMinPage As Integer<br>
+&nbsp;&nbsp;&nbsp; nMaxPage As Integer<br>
+&nbsp;&nbsp;&nbsp; nCopies As Integer<br>
+&nbsp;&nbsp;&nbsp; hInstance As Long<br>
+&nbsp;&nbsp;&nbsp; lCustData As Long<br>
+&nbsp;&nbsp;&nbsp; lpfnPrintHook As Long<br>
+&nbsp;&nbsp;&nbsp; lpfnSetupHook As Long<br>
+&nbsp;&nbsp;&nbsp; lpPrintTemplateName As Long<br>
+&nbsp;&nbsp;&nbsp; lpSetupTemplateName As Long<br>
+&nbsp;&nbsp;&nbsp; hPrintTemplate As Long<br>
+&nbsp;&nbsp;&nbsp; hSetupTemplate As Long<br>
+End Type<br>
+<br>
+'&nbsp; DEVMODE collation selections<br>
+Private Const DMCOLLATE_FALSE = 0<br>
+Private Const DMCOLLATE_TRUE = 1<br>
+<br>
+Private Declare Function PrintDlg Lib &quot;COMDLG32.DLL&quot; _<br>
+&nbsp;&nbsp;&nbsp; Alias &quot;PrintDlgA&quot; (prtdlg As TPRINTDLG) As Integer<br>
+<br>
+Public Enum EPrintDialog<br>
+&nbsp;&nbsp;&nbsp; PD_ALLPAGES = &amp;H0<br>
+&nbsp;&nbsp;&nbsp; PD_SELECTION = &amp;H1<br>
+&nbsp;&nbsp;&nbsp; PD_PAGENUMS = &amp;H2<br>
+&nbsp;&nbsp;&nbsp; PD_NOSELECTION = &amp;H4<br>
+&nbsp;&nbsp;&nbsp; PD_NOPAGENUMS = &amp;H8<br>
+&nbsp;&nbsp;&nbsp; PD_COLLATE = &amp;H10<br>
+&nbsp;&nbsp;&nbsp; PD_PRINTTOFILE = &amp;H20<br>
+&nbsp;&nbsp;&nbsp; PD_PRINTSETUP = &amp;H40<br>
+&nbsp;&nbsp;&nbsp; PD_NOWARNING = &amp;H80<br>
+&nbsp;&nbsp;&nbsp; PD_RETURNDC = &amp;H100<br>
+&nbsp;&nbsp;&nbsp; PD_RETURNIC = &amp;H200<br>
+&nbsp;&nbsp;&nbsp; PD_RETURNDEFAULT = &amp;H400<br>
+&nbsp;&nbsp;&nbsp; PD_SHOWHELP = &amp;H800<br>
+&nbsp;&nbsp;&nbsp; PD_ENABLEPRINTHOOK = &amp;H1000<br>
+&nbsp;&nbsp;&nbsp; PD_ENABLESETUPHOOK = &amp;H2000<br>
+&nbsp;&nbsp;&nbsp; PD_ENABLEPRINTTEMPLATE = &amp;H4000<br>
+&nbsp;&nbsp;&nbsp; PD_ENABLESETUPTEMPLATE = &amp;H8000<br>
+&nbsp;&nbsp;&nbsp; PD_ENABLEPRINTTEMPLATEHANDLE = &amp;H10000<br>
+&nbsp;&nbsp;&nbsp; PD_ENABLESETUPTEMPLATEHANDLE = &amp;H20000<br>
+&nbsp;&nbsp;&nbsp; PD_USEDEVMODECOPIES = &amp;H40000<br>
+&nbsp;&nbsp;&nbsp; PD_USEDEVMODECOPIESANDCOLLATE = &amp;H40000<br>
+&nbsp;&nbsp;&nbsp; PD_DISABLEPRINTTOFILE = &amp;H80000<br>
+&nbsp;&nbsp;&nbsp; PD_HIDEPRINTTOFILE = &amp;H100000<br>
+&nbsp;&nbsp;&nbsp; PD_NONETWORKBUTTON = &amp;H200000<br>
+End Enum<br>
+<br>
+Private Type DEVNAMES<br>
+&nbsp;&nbsp;&nbsp; wDriverOffset As Integer<br>
+&nbsp;&nbsp;&nbsp; wDeviceOffset As Integer<br>
+&nbsp;&nbsp;&nbsp; wOutputOffset As Integer<br>
+&nbsp;&nbsp;&nbsp; wDefault As Integer<br>
+End Type<br>
+<br>
+Private Const CCHDEVICENAME = 32<br>
+Private Const CCHFORMNAME = 32<br>
+Private Type DevMode<br>
+&nbsp;&nbsp;&nbsp; dmDeviceName As String * CCHDEVICENAME<br>
+&nbsp;&nbsp;&nbsp; dmSpecVersion As Integer<br>
+&nbsp;&nbsp;&nbsp; dmDriverVersion As Integer<br>
+&nbsp;&nbsp;&nbsp; dmSize As Integer<br>
+&nbsp;&nbsp;&nbsp; dmDriverExtra As Integer<br>
+&nbsp;&nbsp;&nbsp; dmFields As Long<br>
+&nbsp;&nbsp;&nbsp; dmOrientation As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPaperSize As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPaperLength As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPaperWidth As Integer<br>
+&nbsp;&nbsp;&nbsp; dmScale As Integer<br>
+&nbsp;&nbsp;&nbsp; dmCopies As Integer<br>
+&nbsp;&nbsp;&nbsp; dmDefaultSource As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPrintQuality As Integer<br>
+&nbsp;&nbsp;&nbsp; dmColor As Integer<br>
+&nbsp;&nbsp;&nbsp; dmDuplex As Integer<br>
+&nbsp;&nbsp;&nbsp; dmYResolution As Integer<br>
+&nbsp;&nbsp;&nbsp; dmTTOption As Integer<br>
+&nbsp;&nbsp;&nbsp; dmCollate As Integer<br>
+&nbsp;&nbsp;&nbsp; dmFormName As String * CCHFORMNAME<br>
+&nbsp;&nbsp;&nbsp; dmUnusedPadding As Integer<br>
+&nbsp;&nbsp;&nbsp; dmBitsPerPel As Integer<br>
+&nbsp;&nbsp;&nbsp; dmPelsWidth As Long<br>
+&nbsp;&nbsp;&nbsp; dmPelsHeight As Long<br>
+&nbsp;&nbsp;&nbsp; dmDisplayFlags As Long<br>
+&nbsp;&nbsp;&nbsp; dmDisplayFrequency As Long<br>
+End Type<br>
+<br>
+' New Win95 Page Setup dialogs are up to you<br>
+Private Type POINTL<br>
+&nbsp;&nbsp;&nbsp; x As Long<br>
+&nbsp;&nbsp;&nbsp; y As Long<br>
+End Type<br>
+Private Type RECT<br>
+&nbsp;&nbsp;&nbsp; Left As Long<br>
+&nbsp;&nbsp;&nbsp; Top As Long<br>
+&nbsp;&nbsp;&nbsp; Right As Long<br>
+&nbsp;&nbsp;&nbsp; Bottom As Long<br>
+End Type<br>
+<br>
+<br>
+Private Type TPAGESETUPDLG<br>
+&nbsp;&nbsp;&nbsp; lStructSize&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp; hWndOwner&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp; hDevMode&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp; hDevNames&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp;
+flags&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp; ptPaperSize&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As POINTL<br>
+&nbsp;&nbsp;&nbsp; rtMinMargin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As RECT<br>
+&nbsp;&nbsp;&nbsp; rtMargin&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As RECT<br>
+&nbsp;&nbsp;&nbsp; hInstance&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp; lCustData&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp; lpfnPageSetupHook&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp; lpfnPagePaintHook&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+&nbsp;&nbsp;&nbsp; lpPageSetupTemplateName&nbsp;&nbsp;&nbsp;&nbsp; As Long<br>
+&nbsp;&nbsp;&nbsp; hPageSetupTemplate&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+As Long<br>
+End Type<br>
+<br>
+' EPaperSize constants same as vbPRPS constants<br>
+Public Enum EPaperSize<br>
+&nbsp;&nbsp;&nbsp; epsLetter =
+1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Letter, 8 1/2 x 11 in.<br>
+&nbsp;&nbsp;&nbsp; epsLetterSmall&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Letter Small, 8 1/2 x 11 in.<br>
+&nbsp;&nbsp;&nbsp; epsTabloid&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Tabloid, 11 x 17 in.<br>
+&nbsp;&nbsp;&nbsp; epsLedger&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Ledger, 17 x 11 in.<br>
+&nbsp;&nbsp;&nbsp; epsLegal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Legal, 8 1/2 x 14 in.<br>
+&nbsp;&nbsp;&nbsp; epsStatement&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Statement, 5 1/2 x 8 1/2 in.<br>
+&nbsp;&nbsp;&nbsp; epsExecutive&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Executive, 7 1/2 x 10 1/2 in.<br>
+&nbsp;&nbsp;&nbsp;
+epsA3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' A3, 297 x 420 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsA4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' A4, 210 x 297 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsA4Small&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' A4 Small, 210 x 297 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsA5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' A5, 148 x 210 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsB4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' B4, 250 x 354 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsB5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' B5, 182 x 257 mm<br>
+&nbsp;&nbsp;&nbsp; epsFolio&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Folio, 8 1/2 x 13 in.<br>
+&nbsp;&nbsp;&nbsp; epsQuarto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Quarto, 215 x 275 mm<br>
+&nbsp;&nbsp;&nbsp;
+eps10x14&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' 10 x 14 in.<br>
+&nbsp;&nbsp;&nbsp;
+eps11x17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' 11 x 17 in.<br>
+&nbsp;&nbsp;&nbsp; epsNote&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Note, 8 1/2 x 11 in.<br>
+&nbsp;&nbsp;&nbsp;
+epsEnv9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope #9, 3 7/8 x 8 7/8 in.<br>
+&nbsp;&nbsp;&nbsp;
+epsEnv10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope #10, 4 1/8 x 9 1/2 in.<br>
+&nbsp;&nbsp;&nbsp;
+epsEnv11&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope #11, 4 1/2 x 10 3/8 in.<br>
+&nbsp;&nbsp;&nbsp;
+epsEnv12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope #12, 4 1/2 x 11 in.<br>
+&nbsp;&nbsp;&nbsp;
+epsEnv14&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope #14, 5 x 11 1/2 in.<br>
+&nbsp;&nbsp;&nbsp; epsCSheet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' C size sheet<br>
+&nbsp;&nbsp;&nbsp; epsDSheet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' D size sheet<br>
+&nbsp;&nbsp;&nbsp; epsESheet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' E size sheet<br>
+&nbsp;&nbsp;&nbsp; epsEnvDL&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope DL, 110 x 220 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsEnvC3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope C3, 324 x 458 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsEnvC4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope C4, 229 x 324 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsEnvC5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope C5, 162 x 229 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsEnvC6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope C6, 114 x 162 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsEnvC65&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope C65, 114 x 229 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsEnvB4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope B4, 250 x 353 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsEnvB5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope B5, 176 x 250 mm<br>
+&nbsp;&nbsp;&nbsp;
+epsEnvB6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope B6, 176 x 125 mm<br>
+&nbsp;&nbsp;&nbsp; epsEnvItaly&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope, 110 x 230 mm<br>
+&nbsp;&nbsp;&nbsp; epsenvmonarch&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope Monarch, 3 7/8 x 7 1/2 in.<br>
+&nbsp;&nbsp;&nbsp; epsEnvPersonal&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Envelope, 3 5/8 x 6 1/2 in.<br>
+&nbsp;&nbsp;&nbsp; epsFanfoldUS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' U.S. Standard Fanfold, 14 7/8 x 11 in.<br>
+&nbsp;&nbsp;&nbsp; epsFanfoldStdGerman&nbsp;&nbsp;&nbsp; ' German Standard
+Fanfold, 8 1/2 x 12 in.<br>
+&nbsp;&nbsp;&nbsp; epsFanfoldLglGerman&nbsp;&nbsp;&nbsp; ' German Legal Fanfold,
+8 1/2 x 13 in.<br>
+&nbsp;&nbsp;&nbsp; epsUser =
+256&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' User-defined<br>
+End Enum<br>
+<br>
+' EPrintQuality constants same as vbPRPQ constants<br>
+Public Enum EPrintQuality<br>
+&nbsp;&nbsp;&nbsp; epqDraft = -1<br>
+&nbsp;&nbsp;&nbsp; epqLow = -2<br>
+&nbsp;&nbsp;&nbsp; epqMedium = -3<br>
+&nbsp;&nbsp;&nbsp; epqHigh = -4<br>
+End Enum<br>
+<br>
+Public Enum EOrientation<br>
+&nbsp;&nbsp;&nbsp; eoPortrait = 1<br>
+&nbsp;&nbsp;&nbsp; eoLandscape<br>
+End Enum<br>
+<br>
+Private Declare Function PageSetupDlg Lib &quot;COMDLG32&quot; _<br>
+&nbsp;&nbsp;&nbsp; Alias &quot;PageSetupDlgA&quot; (lppage As TPAGESETUPDLG) As
+Boolean<br>
+<br>
+Public Enum EPageSetup<br>
+&nbsp;&nbsp;&nbsp; PSD_Defaultminmargins = &amp;H0 ' Default (printer's)<br>
+&nbsp;&nbsp;&nbsp; PSD_InWinIniIntlMeasure = &amp;H0<br>
+&nbsp;&nbsp;&nbsp; PSD_MINMARGINS = &amp;H1<br>
+&nbsp;&nbsp;&nbsp; PSD_MARGINS = &amp;H2<br>
+&nbsp;&nbsp;&nbsp; PSD_INTHOUSANDTHSOFINCHES = &amp;H4<br>
+&nbsp;&nbsp;&nbsp; PSD_INHUNDREDTHSOFMILLIMETERS = &amp;H8<br>
+&nbsp;&nbsp;&nbsp; PSD_DISABLEMARGINS = &amp;H10<br>
+&nbsp;&nbsp;&nbsp; PSD_DISABLEPRINTER = &amp;H20<br>
+&nbsp;&nbsp;&nbsp; PSD_NoWarning = &amp;H80<br>
+&nbsp;&nbsp;&nbsp; PSD_DISABLEORIENTATION = &amp;H100<br>
+&nbsp;&nbsp;&nbsp; PSD_ReturnDefault = &amp;H400<br>
+&nbsp;&nbsp;&nbsp; PSD_DISABLEPAPER = &amp;H200<br>
+&nbsp;&nbsp;&nbsp; PSD_ShowHelp = &amp;H800<br>
+&nbsp;&nbsp;&nbsp; PSD_EnablePageSetupHook = &amp;H2000<br>
+&nbsp;&nbsp;&nbsp; PSD_EnablePageSetupTemplate = &amp;H8000<br>
+&nbsp;&nbsp;&nbsp; PSD_EnablePageSetupTemplateHandle = &amp;H20000<br>
+&nbsp;&nbsp;&nbsp; PSD_EnablePagePaintHook = &amp;H40000<br>
+&nbsp;&nbsp;&nbsp; PSD_DisablePagePainting = &amp;H80000<br>
+End Enum<br>
+<br>
+<br>
+Public Enum EPageSetupUnits<br>
+&nbsp;&nbsp;&nbsp; epsuInches<br>
+&nbsp;&nbsp;&nbsp; epsuMillimeters<br>
+End Enum<br>
+<br>
+' Common dialog errors<br>
+<br>
+Private Declare Function CommDlgExtendedError Lib &quot;COMDLG32&quot; () As
+Long<br>
+<br>
+Public Enum EDialogError<br>
+&nbsp;&nbsp;&nbsp; CDERR_DIALOGFAILURE = &amp;HFFFF<br>
+<br>
+&nbsp;&nbsp;&nbsp; CDERR_GENERALCODES = &amp;H0&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_STRUCTSIZE = &amp;H1&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_INITIALIZATION = &amp;H2&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_NOTEMPLATE = &amp;H3&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_NOHINSTANCE = &amp;H4&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_LOADSTRFAILURE = &amp;H5&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_FINDRESFAILURE = &amp;H6&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_LOADRESFAILURE = &amp;H7&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_LOCKRESFAILURE = &amp;H8&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_MEMALLOCFAILURE = &amp;H9&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_MEMLOCKFAILURE = &amp;HA&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_NOHOOK = &amp;HB&amp;<br>
+&nbsp;&nbsp;&nbsp; CDERR_REGISTERMSGFAIL = &amp;HC&amp;<br>
+<br>
+&nbsp;&nbsp;&nbsp; PDERR_PRINTERCODES = &amp;H1000&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_SETUPFAILURE = &amp;H1001&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_PARSEFAILURE = &amp;H1002&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_RETDEFFAILURE = &amp;H1003&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_LOADDRVFAILURE = &amp;H1004&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_GETDEVMODEFAIL = &amp;H1005&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_INITFAILURE = &amp;H1006&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_NODEVICES = &amp;H1007&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_NODEFAULTPRN = &amp;H1008&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_DNDMMISMATCH = &amp;H1009&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_CREATEICFAILURE = &amp;H100A&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_PRINTERNOTFOUND = &amp;H100B&amp;<br>
+&nbsp;&nbsp;&nbsp; PDERR_DEFAULTDIFFERENT = &amp;H100C&amp;<br>
+<br>
+&nbsp;&nbsp;&nbsp; CFERR_CHOOSEFONTCODES = &amp;H2000&amp;<br>
+&nbsp;&nbsp;&nbsp; CFERR_NOFONTS = &amp;H2001&amp;<br>
+&nbsp;&nbsp;&nbsp; CFERR_MAXLESSTHANMIN = &amp;H2002&amp;<br>
+<br>
+&nbsp;&nbsp;&nbsp; FNERR_FILENAMECODES = &amp;H3000&amp;<br>
+&nbsp;&nbsp;&nbsp; FNERR_SUBCLASSFAILURE = &amp;H3001&amp;<br>
+&nbsp;&nbsp;&nbsp; FNERR_INVALIDFILENAME = &amp;H3002&amp;<br>
+&nbsp;&nbsp;&nbsp; FNERR_BUFFERTOOSMALL = &amp;H3003&amp;<br>
+<br>
+&nbsp;&nbsp;&nbsp; CCERR_CHOOSECOLORCODES = &amp;H5000&amp;<br>
+End Enum<br>
+<br>
+' Hook and notification support:<br>
+Private Type NMHDR<br>
+&nbsp;&nbsp;&nbsp; hwndFrom As Long<br>
+&nbsp;&nbsp;&nbsp; idfrom As Long<br>
+&nbsp;&nbsp;&nbsp; code As Long<br>
+End Type<br>
+'// Structure used for all file based OpenFileName notifications<br>
+Private Type OFNOTIFY<br>
+&nbsp;&nbsp;&nbsp; hdr As NMHDR<br>
+&nbsp;&nbsp;&nbsp; lpOFN As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Long pointer
+to OFN structure<br>
+&nbsp;&nbsp;&nbsp; pszFile As String
+';&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // May be NULL<br>
+End Type<br>
+<br>
+'// Structure used for all object based OpenFileName notifications<br>
+Private Type OFNOTIFYEX<br>
+&nbsp;&nbsp;&nbsp; hdr As NMHDR<br>
+&nbsp;&nbsp;&nbsp; lpOFN As Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Long
+pointer to OFN structure<br>
+&nbsp;&nbsp;&nbsp; psf As Long<br>
+&nbsp;&nbsp;&nbsp; LPVOID As
+Long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '// May be NULL<br>
+End Type<br>
+<br>
+Private Type OFNOTIFYshort<br>
+&nbsp;&nbsp;&nbsp; hdr As NMHDR<br>
+&nbsp;&nbsp;&nbsp; lpOFN As Long<br>
+End Type<br>
+<br>
+' Messages:<br>
+Private Const WM_INITDIALOG = &amp;H110<br>
+Private Const WM_NOTIFY = &amp;H4E<br>
+Private Const WM_USER = &amp;H400<br>
+Private Const WM_GETDLGCODE = &amp;H87<br>
+Private Const WM_NCDESTROY = &amp;H82<br>
+<br>
+<br>
+' Notification codes:<br>
+Private Const H_MAX As Long = &amp;HFFFF + 1<br>
+Private Const CDN_FIRST = (H_MAX - 601)<br>
+Private Const CDN_LAST = (H_MAX - 699)<br>
+<br>
+'// Notifications when Open or Save dialog status changes<br>
+Private Const CDN_INITDONE = (CDN_FIRST - &amp;H0)<br>
+Private Const CDN_SELCHANGE = (CDN_FIRST - &amp;H1)<br>
+Private Const CDN_FOLDERCHANGE = (CDN_FIRST - &amp;H2)<br>
+Private Const CDN_SHAREVIOLATION = (CDN_FIRST - &amp;H3)<br>
+Private Const CDN_HELP = (CDN_FIRST - &amp;H4)<br>
+Private Const CDN_FILEOK = (CDN_FIRST - &amp;H5)<br>
+Private Const CDN_TYPECHANGE = (CDN_FIRST - &amp;H6)<br>
+Private Const CDN_INCLUDEITEM = (CDN_FIRST - &amp;H7)<br>
+<br>
+Private Const CDM_FIRST = (WM_USER + 100)<br>
+Private Const CDM_LAST = (WM_USER + 200)<br>
+<br>
+Private Const DWL_MSGRESULT = 0<br>
+Private Declare Function SetWindowLong Lib &quot;user32&quot; Alias &quot;SetWindowLongA&quot;
+(ByVal hwnd As Long, ByVal nIndex As Long, ByVal dwNewLong As Long) As Long<br>
+<br>
+Private Declare Sub CopyMemory Lib &quot;kernel32&quot; Alias &quot;RtlMoveMemory&quot;
+( _<br>
+&nbsp;&nbsp;&nbsp; lpvDest As Any, lpvSource As Any, ByVal cbCopy As Long)<br>
+<br>
+<br>
+' ==========================================================================<br>
+' Implementation:<br>
+' ==========================================================================<br>
+<br>
+' Array of custom colors lasts for life of app<br>
+Private alCustom(0 To 15) As Long, fNotFirst As Boolean<br>
+Public Enum EPrintRange<br>
+&nbsp;&nbsp;&nbsp; eprAll<br>
+&nbsp;&nbsp;&nbsp; eprPageNumbers<br>
+&nbsp;&nbsp;&nbsp; eprSelection<br>
+End Enum<br>
+Private m_lApiReturn As Long<br>
+Private m_lExtendedError As Long<br>
+Private m_dvmode As DevMode<br>
+Private m_oEventSink As Object<br>
+<br>
+Public Function DialogHook( _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ByVal hDlg As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ByVal msg As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ByVal wParam As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ByVal lParam As Long _<br>
+&nbsp;&nbsp;&nbsp; )<br>
+Dim tNMH As NMHDR<br>
+Dim tOFNs As OFNOTIFYshort<br>
+Dim tOF As OPENFILENAME<br>
+<br>
+&nbsp;&nbsp;&nbsp; If Not (m_oEventSink Is Nothing) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Case msg<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case WM_INITDIALOG<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DialogHook =
+m_oEventSink.InitDialog(hDlg)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case WM_NOTIFY<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CopyMemory
+tNMH, ByVal lParam, Len(tNMH)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Select Case
+tNMH.code<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case
+CDN_SELCHANGE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Changed selected file:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DialogHook = m_oEventSink.FileChange(hDlg)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case
+CDN_FOLDERCHANGE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Changed folder:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DialogHook = m_oEventSink.FolderChange(hDlg)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case
+CDN_FILEOK<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Clicked OK:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+If Not m_oEventSink.ConfirmOK() Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+SetWindowLong hDlg, DWL_MSGRESULT, 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DialogHook = 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+SetWindowLong hDlg, DWL_MSGRESULT, 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+End If<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case CDN_HELP<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Help clicked<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case
+CDN_TYPECHANGE<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+DialogHook = m_oEventSink.TypeChange(hDlg)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case
+CDN_INCLUDEITEM<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+' Hmmm<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End Select<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Case WM_NCDESTROY<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+m_oEventSink.DialogClose<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End Select<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+End Function<br>
+<br>
+<br>
+Public Property Get APIReturn() As Long<br>
+&nbsp;&nbsp;&nbsp; 'return object's APIReturn property<br>
+&nbsp;&nbsp;&nbsp; APIReturn = m_lApiReturn<br>
+End Property<br>
+Public Property Get ExtendedError() As Long<br>
+&nbsp;&nbsp;&nbsp; 'return object's ExtendedError property<br>
+&nbsp;&nbsp;&nbsp; ExtendedError = m_lExtendedError<br>
+End Property<br>
+<br>
+Private Sub Class_Initialize()<br>
+#If fComponent Then<br>
+&nbsp;&nbsp;&nbsp; InitColors<br>
+#End If<br>
+End Sub<br>
+<br>
+Function VBGetOpenFileName(Filename As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional FileTitle As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional FileMustExist As Boolean = True, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional MultiSelect As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional ReadOnly As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional HideReadOnly As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Filter As String = &quot;All (*.*)| *.*&quot;, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional FilterIndex As Long = 1, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional InitDir As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DlgTitle As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DefaultExt As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Owner As Long = -1, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional flags As Long = 0, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Hook As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional EventSink As Object _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+) As Boolean<br>
+<br>
+&nbsp;&nbsp;&nbsp; Dim opfile As OPENFILENAME, s As String, afFlags As Long<br>
+<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = 0<br>
+&nbsp;&nbsp;&nbsp; m_lExtendedError = 0<br>
+<br>
+With opfile<br>
+&nbsp;&nbsp;&nbsp; .lStructSize = Len(opfile)<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Add in specific flags and strip out non-VB flags<br>
+<br>
+&nbsp;&nbsp;&nbsp; .flags = (-FileMustExist * OFN_FILEMUSTEXIST) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (-MultiSelect
+* OFN_ALLOWMULTISELECT) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (-ReadOnly
+* OFN_READONLY) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (-HideReadOnly
+* OFN_HIDEREADONLY) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (flags
+And CLng(Not (OFN_ENABLEHOOK Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OFN_ENABLETEMPLATE)))<br>
+&nbsp;&nbsp;&nbsp; ' Owner can take handle of owning window<br>
+&nbsp;&nbsp;&nbsp; If Owner &lt;&gt; -1 Then .hWndOwner = Owner<br>
+&nbsp;&nbsp;&nbsp; ' InitDir can take initial directory string<br>
+&nbsp;&nbsp;&nbsp; .lpstrInitialDir = InitDir<br>
+&nbsp;&nbsp;&nbsp; ' DefaultExt can take default extension<br>
+&nbsp;&nbsp;&nbsp; .lpstrDefExt = DefaultExt<br>
+&nbsp;&nbsp;&nbsp; ' DlgTitle can take dialog box title<br>
+&nbsp;&nbsp;&nbsp; .lpstrTitle = DlgTitle<br>
+<br>
+&nbsp;&nbsp;&nbsp; If (Hook) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ''HookedDialog = Me<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '.lpfnHook = lHookAddress(AddressOf
+DialogHookFunction)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '.flags = .flags Or OFN_ENABLEHOOK Or
+OFN_EXPLORER<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ''Set m_oEventSink = EventSink<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' To make Windows-style filter, replace | and : with nulls<br>
+&nbsp;&nbsp;&nbsp; Dim ch As String, i As Integer<br>
+&nbsp;&nbsp;&nbsp; For i = 1 To Len(Filter)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ch = Mid$(Filter, i, 1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If ch = &quot;|&quot; Or ch =
+&quot;:&quot; Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s = s &amp;
+vbNullChar<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s = s &amp;
+ch<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; Next<br>
+&nbsp;&nbsp;&nbsp; ' Put double null at end<br>
+&nbsp;&nbsp;&nbsp; s = s &amp; vbNullChar &amp; vbNullChar<br>
+&nbsp;&nbsp;&nbsp; .lpstrFilter = s<br>
+&nbsp;&nbsp;&nbsp; .nFilterIndex = FilterIndex<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Pad file and file title buffers to maximum path<br>
+&nbsp;&nbsp;&nbsp; s = Filename &amp; String$(MAX_PATH - Len(Filename), 0)<br>
+&nbsp;&nbsp;&nbsp; .lpstrFile = s<br>
+&nbsp;&nbsp;&nbsp; .nMaxFile = MAX_PATH<br>
+&nbsp;&nbsp;&nbsp; s = FileTitle &amp; String$(MAX_FILE - Len(FileTitle), 0)<br>
+&nbsp;&nbsp;&nbsp; .lpstrFileTitle = s<br>
+&nbsp;&nbsp;&nbsp; .nMaxFileTitle = MAX_FILE<br>
+&nbsp;&nbsp;&nbsp; ' All other fields set to zero<br>
+<br>
+<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = GetOpenFileName(opfile)<br>
+&nbsp;&nbsp;&nbsp; Set m_oEventSink = Nothing<br>
+&nbsp;&nbsp;&nbsp; ''ClearHookedDialog<br>
+&nbsp;&nbsp;&nbsp; Select Case m_lApiReturn<br>
+&nbsp;&nbsp;&nbsp; Case 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Success<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBGetOpenFileName = True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filename = StrZToStr(.lpstrFile)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileTitle = StrZToStr(.lpstrFileTitle)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags = .flags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Return the filter index<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FilterIndex = .nFilterIndex<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Look up the filter the user
+selected and return that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filter = FilterLookup(.lpstrFilter,
+FilterIndex)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If (.flags And OFN_READONLY) Then
+ReadOnly = True<br>
+&nbsp;&nbsp;&nbsp; Case 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Cancelled<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBGetOpenFileName = False<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filename = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileTitle = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FilterIndex = -1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filter = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp; Case Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Extended error<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m_lExtendedError =
+CommDlgExtendedError()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBGetOpenFileName = False<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filename = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileTitle = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FilterIndex = -1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filter = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp; End Select<br>
+&nbsp;&nbsp;&nbsp; Set m_oEventSink = Nothing<br>
+End With<br>
+End Function<br>
+Private Function lHookAddress(lPtr As Long) As Long<br>
+&nbsp;&nbsp;&nbsp; 'Debug.Print lPtr<br>
+&nbsp;&nbsp;&nbsp; lHookAddress = lPtr<br>
+End Function<br>
+Private Function StrZToStr(s As String) As String<br>
+&nbsp;&nbsp;&nbsp; StrZToStr = Left$(s, lstrlen(s))<br>
+End Function<br>
+<br>
+Function VBGetSaveFileName(Filename As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional FileTitle As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional OverWritePrompt As Boolean = True, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Filter As String = &quot;All (*.*)| *.*&quot;, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional FilterIndex As Long = 1, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional InitDir As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DlgTitle As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DefaultExt As String, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Owner As Long = -1, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional flags As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Hook As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional EventSink As Object _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+) As Boolean<br>
+<br>
+&nbsp;&nbsp;&nbsp; Dim opfile As OPENFILENAME, s As String<br>
+<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = 0<br>
+&nbsp;&nbsp;&nbsp; m_lExtendedError = 0<br>
+<br>
+With opfile<br>
+&nbsp;&nbsp;&nbsp; .lStructSize = Len(opfile)<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Add in specific flags and strip out non-VB flags<br>
+&nbsp;&nbsp;&nbsp; .flags = (-OverWritePrompt * OFN_OVERWRITEPROMPT) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OFN_HIDEREADONLY Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (flags
+And CLng(Not (OFN_ENABLEHOOK Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+OFN_ENABLETEMPLATE)))<br>
+&nbsp;&nbsp;&nbsp; ' Owner can take handle of owning window<br>
+&nbsp;&nbsp;&nbsp; If Owner &lt;&gt; -1 Then .hWndOwner = Owner<br>
+&nbsp;&nbsp;&nbsp; ' InitDir can take initial directory string<br>
+&nbsp;&nbsp;&nbsp; .lpstrInitialDir = InitDir<br>
+&nbsp;&nbsp;&nbsp; ' DefaultExt can take default extension<br>
+&nbsp;&nbsp;&nbsp; .lpstrDefExt = DefaultExt<br>
+&nbsp;&nbsp;&nbsp; ' DlgTitle can take dialog box title<br>
+&nbsp;&nbsp;&nbsp; .lpstrTitle = DlgTitle<br>
+<br>
+&nbsp;&nbsp;&nbsp; If (Hook) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ''HookedDialog = Me<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '.lpfnHook = lHookAddress(AddressOf
+DialogHookFunction)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '.flags = .flags Or OFN_ENABLEHOOK Or
+OFN_EXPLORER<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ''Set m_oEventSink = EventSink<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Make new filter with bars (|) replacing nulls and double
+null at end<br>
+&nbsp;&nbsp;&nbsp; Dim ch As String, i As Integer<br>
+&nbsp;&nbsp;&nbsp; For i = 1 To Len(Filter)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ch = Mid$(Filter, i, 1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If ch = &quot;|&quot; Or ch =
+&quot;:&quot; Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s = s &amp;
+vbNullChar<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s = s &amp;
+ch<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; Next<br>
+&nbsp;&nbsp;&nbsp; ' Put double null at end<br>
+&nbsp;&nbsp;&nbsp; s = s &amp; vbNullChar &amp; vbNullChar<br>
+&nbsp;&nbsp;&nbsp; .lpstrFilter = s<br>
+&nbsp;&nbsp;&nbsp; .nFilterIndex = FilterIndex<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Pad file and file title buffers to maximum path<br>
+&nbsp;&nbsp;&nbsp; s = Filename &amp; String$(MAX_PATH - Len(Filename), 0)<br>
+&nbsp;&nbsp;&nbsp; .lpstrFile = s<br>
+&nbsp;&nbsp;&nbsp; .nMaxFile = MAX_PATH<br>
+&nbsp;&nbsp;&nbsp; s = FileTitle &amp; String$(MAX_FILE - Len(FileTitle), 0)<br>
+&nbsp;&nbsp;&nbsp; .lpstrFileTitle = s<br>
+&nbsp;&nbsp;&nbsp; .nMaxFileTitle = MAX_FILE<br>
+&nbsp;&nbsp;&nbsp; ' All other fields zero<br>
+<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = GetSaveFileName(opfile)<br>
+&nbsp;&nbsp;&nbsp; Set m_oEventSink = Nothing<br>
+&nbsp;&nbsp;&nbsp; 'ClearHookedDialog<br>
+&nbsp;&nbsp;&nbsp; Select Case m_lApiReturn<br>
+&nbsp;&nbsp;&nbsp; Case 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBGetSaveFileName = True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filename = StrZToStr(.lpstrFile)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileTitle = StrZToStr(.lpstrFileTitle)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags = .flags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Return the filter index<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FilterIndex = .nFilterIndex<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Look up the filter the user
+selected and return that<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filter = FilterLookup(.lpstrFilter,
+FilterIndex)<br>
+&nbsp;&nbsp;&nbsp; Case 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Cancelled:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBGetSaveFileName = False<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filename = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileTitle = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FilterIndex = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filter = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp; Case Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Extended error:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBGetSaveFileName = False<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m_lExtendedError =
+CommDlgExtendedError()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filename = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FileTitle = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FilterIndex = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Filter = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp; End Select<br>
+End With<br>
+End Function<br>
+<br>
+Private Function FilterLookup(ByVal sFilters As String, ByVal iCur As Long) As
+String<br>
+&nbsp;&nbsp;&nbsp; Dim iStart As Long, iEnd As Long, s As String<br>
+&nbsp;&nbsp;&nbsp; iStart = 1<br>
+&nbsp;&nbsp;&nbsp; If sFilters = &quot;&quot; Then Exit Function<br>
+&nbsp;&nbsp;&nbsp; Do<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Cut out both parts marked by null
+character<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iEnd = InStr(iStart, sFilters,
+vbNullChar)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If iEnd = 0 Then Exit Function<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iEnd = InStr(iEnd + 1, sFilters,
+vbNullChar)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If iEnd Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s =
+Mid$(sFilters, iStart, iEnd - iStart)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s =
+Mid$(sFilters, iStart)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iStart = iEnd + 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If iCur = 1 Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FilterLookup
+= s<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Exit Function<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; iCur = iCur - 1<br>
+&nbsp;&nbsp;&nbsp; Loop While iCur<br>
+End Function<br>
+<br>
+Function VBGetFileTitle(sFIle As String) As String<br>
+&nbsp;&nbsp;&nbsp; Dim sFileTitle As String, cFileTitle As Integer<br>
+<br>
+&nbsp;&nbsp;&nbsp; cFileTitle = MAX_PATH<br>
+&nbsp;&nbsp;&nbsp; sFileTitle = String$(MAX_PATH, 0)<br>
+&nbsp;&nbsp;&nbsp; cFileTitle = GetFileTitle(sFIle, sFileTitle, MAX_PATH)<br>
+&nbsp;&nbsp;&nbsp; If cFileTitle Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBGetFileTitle = &quot;&quot;<br>
+&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBGetFileTitle = Left$(sFileTitle,
+InStr(sFileTitle, vbNullChar) - 1)<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+End Function<br>
+<br>
+' ChooseColor wrapper<br>
+Function VBChooseColor(Color As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional AnyColor As Boolean = True, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional FullOpen As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DisableFullOpen As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Owner As Long = -1, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional flags As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Hook As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional EventSink As Object _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+) As Boolean<br>
+<br>
+&nbsp;&nbsp;&nbsp; Dim chclr As TCHOOSECOLOR<br>
+&nbsp;&nbsp;&nbsp; chclr.lStructSize = Len(chclr)<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Color must get reference variable to receive result<br>
+&nbsp;&nbsp;&nbsp; ' Flags can get reference variable or constant with bit flags<br>
+&nbsp;&nbsp;&nbsp; ' Owner can take handle of owning window<br>
+&nbsp;&nbsp;&nbsp; If Owner &lt;&gt; -1 Then chclr.hWndOwner = Owner<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Assign color (default uninitialized value of zero is good
+default)<br>
+&nbsp;&nbsp;&nbsp; chclr.rgbResult = Color<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Mask out unwanted bits<br>
+&nbsp;&nbsp;&nbsp; Dim afMask As Long<br>
+&nbsp;&nbsp;&nbsp; afMask = CLng(Not (CC_ENABLEHOOK Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+CC_ENABLETEMPLATE))<br>
+&nbsp;&nbsp;&nbsp; ' Pass in flags<br>
+&nbsp;&nbsp;&nbsp; chclr.flags = afMask And (CC_RGBInit Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+IIf(AnyColor, CC_AnyColor, CC_SolidColor) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(-FullOpen * CC_FullOpen) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(-DisableFullOpen * CC_PreventFullOpen))<br>
+<br>
+&nbsp;&nbsp;&nbsp; If (Hook) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'HookedDialog = Me<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'chclr.lpfnHook =
+lHookAddress(AddressOf CCHookProc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'chclr.flags = chclr.flags Or
+CC_ENABLEHOOK<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'Set m_oEventSink = EventSink<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' If first time, initialize to white<br>
+&nbsp;&nbsp;&nbsp; If fNotFirst = False Then InitColors<br>
+<br>
+&nbsp;&nbsp;&nbsp; chclr.lpCustColors = VarPtr(alCustom(0))<br>
+&nbsp;&nbsp;&nbsp; ' All other fields zero<br>
+<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = ChooseColor(chclr)<br>
+&nbsp;&nbsp;&nbsp; Set m_oEventSink = Nothing<br>
+&nbsp;&nbsp;&nbsp; 'ClearHookedDialog<br>
+<br>
+&nbsp;&nbsp;&nbsp; Select Case m_lApiReturn<br>
+&nbsp;&nbsp;&nbsp; Case 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Success<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBChooseColor = True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Color = chclr.rgbResult<br>
+&nbsp;&nbsp;&nbsp; Case 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Cancelled<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBChooseColor = False<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Color = -1<br>
+&nbsp;&nbsp;&nbsp; Case Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Extended error<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m_lExtendedError =
+CommDlgExtendedError()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBChooseColor = False<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Color = -1<br>
+&nbsp;&nbsp;&nbsp; End Select<br>
+<br>
+End Function<br>
+<br>
+Friend Sub InitColors()<br>
+&nbsp;&nbsp;&nbsp; Dim i As Integer<br>
+&nbsp;&nbsp;&nbsp; ' Initialize with first 16 system interface colors<br>
+&nbsp;&nbsp;&nbsp; For i = 0 To 15<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alCustom(i) = GetSysColor(i)<br>
+&nbsp;&nbsp;&nbsp; Next<br>
+&nbsp;&nbsp;&nbsp; fNotFirst = True<br>
+End Sub<br>
+<br>
+' Property to read or modify custom colors (use to save colors in registry)<br>
+Public Property Get CustomColor(i As Integer) As Long<br>
+&nbsp;&nbsp;&nbsp; ' If first time, initialize to white<br>
+&nbsp;&nbsp;&nbsp; If fNotFirst = False Then InitColors<br>
+&nbsp;&nbsp;&nbsp; If i &gt;= 0 And i &lt;= 15 Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CustomColor = alCustom(i)<br>
+&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CustomColor = -1<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+End Property<br>
+<br>
+Public Property Let CustomColor(i As Integer, iValue As Long)<br>
+&nbsp;&nbsp;&nbsp; ' If first time, initialize to system colors<br>
+&nbsp;&nbsp;&nbsp; If fNotFirst = False Then InitColors<br>
+&nbsp;&nbsp;&nbsp; If i &gt;= 0 And i &lt;= 15 Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; alCustom(i) = iValue<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+End Property<br>
+<br>
+' ChooseFont wrapper<br>
+Function VBChooseFont(CurFont As Font, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional PrinterDC As Long = -1, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Owner As Long = -1, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Color As Long = vbBlack, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional MinSize As Long = 0, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional MaxSize As Long = 0, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional flags As Long = 0, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Hook As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional EventSink As Object _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+) As Boolean<br>
+<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = 0<br>
+&nbsp;&nbsp;&nbsp; m_lExtendedError = 0<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Unwanted Flags bits<br>
+&nbsp;&nbsp;&nbsp; Const CF_FontNotSupported = CF_Apply Or CF_EnableHook Or
+CF_EnableTemplate<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Flags can get reference variable or constant with bit flags<br>
+&nbsp;&nbsp;&nbsp; ' PrinterDC can take printer DC<br>
+&nbsp;&nbsp;&nbsp; If PrinterDC = -1 Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PrinterDC = 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If flags And CF_PrinterFonts Then
+PrinterDC = Printer.hdc<br>
+&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags = flags Or CF_PrinterFonts<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; ' Must have some fonts<br>
+&nbsp;&nbsp;&nbsp; If (flags And CF_PrinterFonts) = 0 Then flags = flags Or
+CF_ScreenFonts<br>
+&nbsp;&nbsp;&nbsp; ' Color can take initial color, receive chosen color<br>
+&nbsp;&nbsp;&nbsp; If Color &lt;&gt; vbBlack Then flags = flags Or CF_EFFECTS<br>
+&nbsp;&nbsp;&nbsp; ' MinSize can be minimum size accepted<br>
+&nbsp;&nbsp;&nbsp; If MinSize Then flags = flags Or CF_LimitSize<br>
+&nbsp;&nbsp;&nbsp; ' MaxSize can be maximum size accepted<br>
+&nbsp;&nbsp;&nbsp; If MaxSize Then flags = flags Or CF_LimitSize<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Put in required internal flags and remove unsupported<br>
+&nbsp;&nbsp;&nbsp; flags = (flags Or CF_InitToLogFontStruct) And Not
+CF_FontNotSupported<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Initialize LOGFONT variable<br>
+&nbsp;&nbsp;&nbsp; Dim fnt As LOGFONT<br>
+&nbsp;&nbsp;&nbsp; Const PointsPerTwip = 1440 / 72<br>
+&nbsp;&nbsp;&nbsp; fnt.lfHeight = -(CurFont.Size * (PointsPerTwip /
+Screen.TwipsPerPixelY))<br>
+&nbsp;&nbsp;&nbsp; fnt.lfWeight = CurFont.Weight<br>
+&nbsp;&nbsp;&nbsp; fnt.lfItalic = CurFont.Italic<br>
+&nbsp;&nbsp;&nbsp; fnt.lfUnderline = CurFont.Underline<br>
+&nbsp;&nbsp;&nbsp; fnt.lfStrikeOut = CurFont.Strikethrough<br>
+&nbsp;&nbsp;&nbsp; ' Other fields zero<br>
+&nbsp;&nbsp;&nbsp; StrToBytes fnt.lfFaceName, CurFont.Name<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Initialize TCHOOSEFONT variable<br>
+&nbsp;&nbsp;&nbsp; Dim cf As TCHOOSEFONT<br>
+&nbsp;&nbsp;&nbsp; cf.lStructSize = Len(cf)<br>
+&nbsp;&nbsp;&nbsp; If Owner &lt;&gt; -1 Then cf.hWndOwner = Owner<br>
+&nbsp;&nbsp;&nbsp; cf.hdc = PrinterDC<br>
+&nbsp;&nbsp;&nbsp; cf.lpLogFont = VarPtr(fnt)<br>
+&nbsp;&nbsp;&nbsp; cf.iPointSize = CurFont.Size * 10<br>
+&nbsp;&nbsp;&nbsp; cf.flags = flags<br>
+&nbsp;&nbsp;&nbsp; cf.rgbColors = Color<br>
+&nbsp;&nbsp;&nbsp; cf.nSizeMin = MinSize<br>
+&nbsp;&nbsp;&nbsp; cf.nSizeMax = MaxSize<br>
+<br>
+&nbsp;&nbsp;&nbsp; If (Hook) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'HookedDialog = Me<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'cf.lpfnHook = lHookAddress(AddressOf
+CFHookProc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'cf.flags = cf.flags Or CF_EnableHook<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'Set m_oEventSink = EventSink<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' All other fields zero<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = ChooseFont(cf)<br>
+&nbsp;&nbsp;&nbsp; Set m_oEventSink = Nothing<br>
+&nbsp;&nbsp;&nbsp; 'ClearHookedDialog<br>
+&nbsp;&nbsp;&nbsp; Select Case m_lApiReturn<br>
+&nbsp;&nbsp;&nbsp; Case 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Success<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBChooseFont = True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags = cf.flags<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Color = cf.rgbColors<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CurFont.Bold = cf.nFontType And
+Bold_FontType<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'CurFont.Italic = cf.nFontType And
+Italic_FontType<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CurFont.Italic = fnt.lfItalic<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CurFont.Strikethrough =
+fnt.lfStrikeOut<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CurFont.Underline = fnt.lfUnderline<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CurFont.Weight = fnt.lfWeight<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CurFont.Size = cf.iPointSize / 10<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CurFont.Name =
+BytesToStr(fnt.lfFaceName)<br>
+&nbsp;&nbsp;&nbsp; Case 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Cancelled<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBChooseFont = False<br>
+&nbsp;&nbsp;&nbsp; Case Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Extended error<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m_lExtendedError =
+CommDlgExtendedError()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBChooseFont = False<br>
+&nbsp;&nbsp;&nbsp; End Select<br>
+<br>
+End Function<br>
+<br>
+' PrintDlg wrapper<br>
+Function VBPrintDlg(hdc As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional PrintRange As EPrintRange = eprAll, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DisablePageNumbers As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional FromPage As Long = 1, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional ToPage As Long = &amp;HFFFF, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DisableSelection As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Copies As Integer, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional ShowPrintToFile As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DisablePrintToFile As Boolean = True, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional PrintToFile As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Collate As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional PreventWarning As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Owner As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Printer As Object, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional flags As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Hook As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional EventSink As Object _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+) As Boolean<br>
+&nbsp;&nbsp;&nbsp; Dim afFlags As Long<br>
+<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = 0<br>
+&nbsp;&nbsp;&nbsp; m_lExtendedError = 0<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Set PRINTDLG flags<br>
+&nbsp;&nbsp;&nbsp; afFlags = flags<br>
+&nbsp;&nbsp;&nbsp; afFlags = afFlags Or (Abs(DisablePageNumbers) * PD_NOPAGENUMS)
+Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Abs(DisablePrintToFile)
+* PD_DISABLEPRINTTOFILE) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Abs(DisableSelection)
+* PD_NOSELECTION) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Abs(PrintToFile)
+* PD_PRINTTOFILE) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Abs(Not
+ShowPrintToFile) * PD_HIDEPRINTTOFILE) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Abs(PreventWarning)
+* PD_NOWARNING) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (Abs(Collate)
+* PD_COLLATE) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+PD_USEDEVMODECOPIESANDCOLLATE Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+PD_RETURNDC<br>
+&nbsp;&nbsp;&nbsp; If PrintRange = eprPageNumbers Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; afFlags = afFlags Or PD_PAGENUMS<br>
+&nbsp;&nbsp;&nbsp; ElseIf PrintRange = eprSelection Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; afFlags = afFlags Or PD_SELECTION<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; ' Mask out unwanted bits<br>
+&nbsp;&nbsp;&nbsp; afFlags = afFlags And Not PD_ENABLEPRINTHOOK<br>
+&nbsp;&nbsp;&nbsp; afFlags = afFlags And Not PD_ENABLEPRINTTEMPLATE<br>
+&nbsp;&nbsp;&nbsp; afFlags = afFlags And Not PD_ENABLESETUPHOOK<br>
+&nbsp;&nbsp;&nbsp; afFlags = afFlags And Not PD_ENABLESETUPTEMPLATE<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Fill in PRINTDLG structure<br>
+&nbsp;&nbsp;&nbsp; Dim pd As TPRINTDLG<br>
+&nbsp;&nbsp;&nbsp; pd.lStructSize = Len(pd)<br>
+&nbsp;&nbsp;&nbsp; pd.hWndOwner = Owner<br>
+&nbsp;&nbsp;&nbsp; pd.flags = afFlags<br>
+&nbsp;&nbsp;&nbsp; pd.nFromPage = FromPage<br>
+&nbsp;&nbsp;&nbsp; pd.nToPage = ToPage<br>
+&nbsp;&nbsp;&nbsp; pd.nMinPage = 1<br>
+&nbsp;&nbsp;&nbsp; pd.nMaxPage = &amp;HFFFF<br>
+&nbsp;&nbsp;&nbsp; If (Hook) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'HookedDialog = Me<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'Set m_oEventSink = EventSink<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If (pd.flags And PD_PRINTSETUP) =
+PD_PRINTSETUP Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'pd.flags =
+pd.flags Or PD_ENABLESETUPHOOK<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'pd.lpfnSetupHook
+= lHookAddress(AddressOf PrintSetupHookProc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'pd.flags =
+pd.flags Or PD_ENABLEPRINTHOOK<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'pd.lpfnPrintHook
+= lHookAddress(AddressOf PrintHookProc)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Show Print dialog<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = PrintDlg(pd)<br>
+&nbsp;&nbsp;&nbsp; 'ClearHookedDialog<br>
+&nbsp;&nbsp;&nbsp; Set m_oEventSink = Nothing<br>
+&nbsp;&nbsp;&nbsp; Select Case m_lApiReturn<br>
+&nbsp;&nbsp;&nbsp; Case 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBPrintDlg = True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Return dialog values in parameters<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; hdc = pd.hdc<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If (pd.flags And PD_PAGENUMS) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PrintRange =
+eprPageNumbers<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ElseIf (pd.flags And PD_SELECTION)
+Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PrintRange =
+eprSelection<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PrintRange =
+eprAll<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FromPage = pd.nFromPage<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ToPage = pd.nToPage<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PrintToFile = (pd.flags And
+PD_PRINTTOFILE)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Get DEVMODE structure from PRINTDLG<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dim pDevMode As Long<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pDevMode = GlobalLock(pd.hDevMode)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CopyMemory m_dvmode, ByVal pDevMode,
+Len(m_dvmode)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GlobalUnlock pd.hDevMode<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If (pd.flags And PD_COLLATE) =
+PD_COLLATE Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' User
+selected collate option but printer driver<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' does not
+support collation.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Collation
+option must be set from the<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' PRINTDLG
+structure:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Collate =
+True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Copies =
+pd.nCopies<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Print
+driver supports collation or collation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' not
+switched on.<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' DEVMODE
+structure contains Collation and copy<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' information<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Get Copies
+and Collate settings from DEVMODE structure<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Collate = (m_dvmode.dmCollate
+= DMCOLLATE_TRUE)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Copies =
+m_dvmode.dmCopies<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Set default printer properties<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; On Error Resume Next<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If Not (Printer Is Nothing) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer.Copies = Copies<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer.Orientation = m_dvmode.dmOrientation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer.PaperSize = m_dvmode.dmPaperSize<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer.PrintQuality = m_dvmode.dmPrintQuality<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; On Error GoTo 0<br>
+&nbsp;&nbsp;&nbsp; Case 0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Cancelled<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBPrintDlg = False<br>
+&nbsp;&nbsp;&nbsp; Case Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Extended error:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m_lExtendedError =
+CommDlgExtendedError()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBPrintDlg = False<br>
+&nbsp;&nbsp;&nbsp; End Select<br>
+<br>
+End Function<br>
+Friend Property Get DevMode() As DevMode<br>
+&nbsp;&nbsp;&nbsp; DevMode = m_dvmode<br>
+End Property<br>
+Public Function VBPageSetupDlg2( _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional Owner As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional DisableMargins As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional DisableOrientation As
+Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional DisablePaper As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional DisablePrinter As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional LeftMargin As Single, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional MinLeftMargin As Single, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional RightMargin As Single, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional MinRightMargin As Single, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional TopMargin As Single, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional MinTopMargin As Single, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional BottomMargin As Single, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional MinBottomMargin As Single, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional PaperSize As EPaperSize =
+epsLetter, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional Orientation As EOrientation
+= eoPortrait, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional PrintQuality As
+EPrintQuality = epqDraft, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional Units As EPageSetupUnits =
+epsuInches, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional Printer As Object, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional flags As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional Hook As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Optional EventSink As Object _<br>
+&nbsp;&nbsp;&nbsp; ) As Boolean<br>
+Dim afFlags As Long, afMask As Long<br>
+<br>
+&nbsp;&nbsp;&nbsp; m_lApiReturn = 0<br>
+&nbsp;&nbsp;&nbsp; m_lExtendedError = 0<br>
+&nbsp;&nbsp;&nbsp; ' Mask out unwanted bits<br>
+&nbsp;&nbsp;&nbsp; afMask = Not (PSD_EnablePagePaintHook Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+PSD_EnablePageSetupHook Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+PSD_EnablePageSetupTemplate)<br>
+&nbsp;&nbsp;&nbsp; ' Set TPAGESETUPDLG flags<br>
+&nbsp;&nbsp;&nbsp; afFlags = (-DisableMargins * PSD_DISABLEMARGINS) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(-DisableOrientation * PSD_DISABLEORIENTATION) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(-DisablePaper * PSD_DISABLEPAPER) Or _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(-DisablePrinter * PSD_DISABLEPRINTER) _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+And afMask<br>
+&nbsp;&nbsp;&nbsp; If (flags And PSD_Defaultminmargins) = PSD_Defaultminmargins
+Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; afFlags = afFlags Or
+PSD_Defaultminmargins<br>
+&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; afFlags = afFlags Or PSD_MARGINS<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; Dim lUnits As Long<br>
+&nbsp;&nbsp;&nbsp; If Units = epsuInches Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; afFlags = afFlags Or
+PSD_INTHOUSANDTHSOFINCHES<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lUnits = 1000<br>
+&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; afFlags = afFlags Or
+PSD_INHUNDREDTHSOFMILLIMETERS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; lUnits = 100<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+&nbsp;&nbsp;&nbsp; Dim psd As TPAGESETUPDLG<br>
+&nbsp;&nbsp;&nbsp; ' Fill in PRINTDLG structure<br>
+&nbsp;&nbsp;&nbsp; psd.lStructSize = Len(psd)<br>
+&nbsp;&nbsp;&nbsp; psd.hWndOwner = Owner<br>
+&nbsp;&nbsp;&nbsp; psd.rtMargin.Top = TopMargin * lUnits<br>
+&nbsp;&nbsp;&nbsp; psd.rtMargin.Left = LeftMargin * lUnits<br>
+&nbsp;&nbsp;&nbsp; psd.rtMargin.Bottom = BottomMargin * lUnits<br>
+&nbsp;&nbsp;&nbsp; psd.rtMargin.Right = RightMargin * lUnits<br>
+&nbsp;&nbsp;&nbsp; psd.rtMinMargin.Top = MinTopMargin * lUnits<br>
+&nbsp;&nbsp;&nbsp; psd.rtMinMargin.Left = MinLeftMargin * lUnits<br>
+&nbsp;&nbsp;&nbsp; psd.rtMinMargin.Bottom = MinBottomMargin * lUnits<br>
+&nbsp;&nbsp;&nbsp; psd.rtMinMargin.Right = MinRightMargin * lUnits<br>
+&nbsp;&nbsp;&nbsp; psd.flags = afFlags<br>
+&nbsp;&nbsp;&nbsp; If (Hook) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'HookedDialog = Me<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'Set m_oEventSink = EventSink<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'psd.lpfnPageSetupHook =
+lHookAddress(AddressOf PageSetupHook)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'psd.flags = psd.flags Or
+PSD_EnablePageSetupHook<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+<br>
+&nbsp;&nbsp;&nbsp; ' Show Print dialog<br>
+&nbsp;&nbsp;&nbsp; If PageSetupDlg(psd) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VBPageSetupDlg2 = True<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Return dialog values in parameters<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TopMargin = psd.rtMargin.Top / lUnits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; LeftMargin = psd.rtMargin.Left /
+lUnits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BottomMargin = psd.rtMargin.Bottom /
+lUnits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RightMargin = psd.rtMargin.Right /
+lUnits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MinTopMargin = psd.rtMinMargin.Top /
+lUnits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MinLeftMargin = psd.rtMinMargin.Left
+/ lUnits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MinBottomMargin =
+psd.rtMinMargin.Bottom / lUnits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MinRightMargin =
+psd.rtMinMargin.Right / lUnits<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Get DEVMODE structure from PRINTDLG<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dim dvmode As DevMode, pDevMode As
+Long<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; pDevMode = GlobalLock(psd.hDevMode)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CopyMemory dvmode, ByVal pDevMode,
+Len(dvmode)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GlobalUnlock psd.hDevMode<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PaperSize = dvmode.dmPaperSize<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Orientation = dvmode.dmOrientation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PrintQuality = dvmode.dmPrintQuality<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Set default printer properties<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; On Error Resume Next<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If Not (Printer Is Nothing) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer.Copies = dvmode.dmCopies<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer.Orientation = dvmode.dmOrientation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer.PaperSize = dvmode.dmPaperSize<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Printer.PrintQuality = dvmode.dmPrintQuality<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; On Error GoTo 0<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+&nbsp;&nbsp;&nbsp; Set m_oEventSink = Nothing<br>
+&nbsp;&nbsp;&nbsp; 'ClearHookedDialog<br>
+<br>
+End Function<br>
+<br>
+' PageSetupDlg wrapper<br>
+Function VBPageSetupDlg(Optional Owner As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DisableMargins As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DisableOrientation As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DisablePaper As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional DisablePrinter As Boolean, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional LeftMargin As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional MinLeftMargin As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional RightMargin As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional MinRightMargin As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional TopMargin As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional MinTopMargin As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional BottomMargin As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional MinBottomMargin As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional PaperSize As EPaperSize = epsLetter, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Orientation As EOrientation = eoPortrait, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional PrintQuality As EPrintQuality = epqDraft, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Units As EPageSetupUnits = epsuInches, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Printer As Object, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional flags As Long, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional Hook As Boolean = False, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Optional EventSink As Object _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+) As Boolean<br>
+Dim fLeftMargin As Single<br>
+Dim fMinLeftMargin As Single<br>
+Dim fRightMargin As Single<br>
+Dim fMinRightMargin As Single<br>
+Dim fTopMargin As Single<br>
+Dim fMinTopMargin As Single<br>
+Dim fBottomMargin As Single<br>
+Dim fMinBottomMargin As Single<br>
+<br>
+&nbsp;&nbsp;&nbsp; VBPageSetupDlg2 _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Owner, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DisableMargins, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DisableOrientation, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DisablePaper, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DisablePrinter, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fLeftMargin, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fMinLeftMargin, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fRightMargin, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fMinRightMargin, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fTopMargin, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fMinTopMargin, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fBottomMargin, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; fMinBottomMargin, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PaperSize, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Orientation, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PrintQuality, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Units, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Printer, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; flags, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Hook, _<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; EventSink<br>
+&nbsp;&nbsp;&nbsp; LeftMargin = fLeftMargin<br>
+&nbsp;&nbsp;&nbsp; MinLeftMargin = fMinLeftMargin<br>
+&nbsp;&nbsp;&nbsp; RightMargin = fRightMargin<br>
+&nbsp;&nbsp;&nbsp; MinRightMargin = fMinRightMargin<br>
+&nbsp;&nbsp;&nbsp; TopMargin = fTopMargin<br>
+&nbsp;&nbsp;&nbsp; MinTopMargin = fMinTopMargin<br>
+&nbsp;&nbsp;&nbsp; BottomMargin = fBottomMargin<br>
+&nbsp;&nbsp;&nbsp; MinBottomMargin = fMinBottomMargin<br>
+End Function<br>
+<br>
+#If fComponent = 0 Then<br>
+Private Sub ErrRaise(e As Long)<br>
+&nbsp;&nbsp;&nbsp; Dim sText As String, sSource As String<br>
+&nbsp;&nbsp;&nbsp; If e &gt; 1000 Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sSource = App.EXEName &amp; &quot;.CommonDialog&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Err.Raise COMError(e), sSource, sText<br>
+&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Raise standard Visual Basic error<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; sSource = App.EXEName &amp; &quot;.VBError&quot;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Err.Raise e, sSource<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+End Sub<br>
+#End If<br>
+<br>
+<br>
+Private Sub StrToBytes(ab() As Byte, s As String)<br>
+&nbsp;&nbsp;&nbsp; If IsArrayEmpty(ab) Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Assign to empty array<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ab = StrConv(s, vbFromUnicode)<br>
+&nbsp;&nbsp;&nbsp; Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Dim cab As Long<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ' Copy to existing array, padding or
+truncating if necessary<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; cab = UBound(ab) - LBound(ab) + 1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If Len(s) &lt; cab Then s = s &amp;
+String$(cab - Len(s), 0)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'If UnicodeTypeLib Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '&nbsp;&nbsp;&nbsp; Dim st As String<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '&nbsp;&nbsp;&nbsp; st = StrConv(s,
+vbFromUnicode)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '&nbsp;&nbsp;&nbsp; CopyMemoryStr
+ab(LBound(ab)), st, cab<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'Else<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CopyMemoryStr
+ab(LBound(ab)), s, cab<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 'End If<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+End Sub<br>
+<br>
+<br>
+Private Function BytesToStr(ab() As Byte) As String<br>
+&nbsp;&nbsp;&nbsp; BytesToStr = StrConv(ab, vbUnicode)<br>
+End Function<br>
+<br>
+Private Function COMError(e As Long) As Long<br>
+&nbsp;&nbsp;&nbsp; COMError = e Or vbObjectError<br>
+End Function<br>
+'<br>
+Private Function IsArrayEmpty(va As Variant) As Boolean<br>
+&nbsp;&nbsp;&nbsp; Dim v As Variant<br>
+&nbsp;&nbsp;&nbsp; On Error Resume Next<br>
+&nbsp;&nbsp;&nbsp; v = va(LBound(va))<br>
+&nbsp;&nbsp;&nbsp; IsArrayEmpty = (Err &lt;&gt; 0)<br>
+End Function</small></font></small></p>
+<p><small><font face="Verdana">Ok, I know, that was a lot of code.&nbsp; I am
+not even going to try to explain it, but it is a class that contains public
+functions to call up the Open File, Save File, Choose Color, Choose Font, and
+Printer windows without having to put a Common Dialog Control on a form or even
+reference the control.&nbsp; You will love it.&nbsp;</font></small></p>
+<p><small><b><font face="Verdana">Compile:</font></b></small></p>
+<p><small><font face="Verdana">Ok we have a lot of code but some of you may
+still be asking why.&nbsp; So go ahead and compile so we can see what all this
+does for us.&nbsp; Remember, compile to a location you will not move it from
+anytime soon.</font></small></p>
+<p><small><font face="Verdana">After you compile, just like in my active x
+control tutorial, go to Project menu, then COMUTIL properties.&nbsp; Then the
+Component Tab.&nbsp; Click on Binary Compatability.&nbsp; If you do not know why
+instead of me typing why again, pull up my other PSC submissions and read why in
+my Make an Active X Control Step by Step article.&nbsp; Click Ok.</font></small></p>
+<p><small><b><font face="Verdana">Using the DLL:</font></b></small></p>
+<p><small><font face="Verdana">Ok now, go ahead and close VB.&nbsp; Re-open and
+start a new standard EXE application.</font></small></p>
+<p><small><font face="Verdana">Don't worry about names, just put a command
+button on the default form.</font></small></p>
+<p><small><font face="Verdana">Now go up to the Project Menu, click it, then
+choose References.</font></small></p>
+<p><small><font face="Verdana">Scroll down and go to the C's and locate
+&quot;Common Utilities&quot; which was our description for our DLL.&nbsp; Check
+it on and click ok.&nbsp; What this does is tell our project all out about our
+DLL and the classes and calls available.&nbsp; Referencing it is known as Early
+Binding.&nbsp; We could of skipped this and used the CreateObject function (late
+binding) but that is a different lesson once again.&nbsp; Pretty much this is
+easiest and also shows you what we did best.</font></small></p>
+<p><small><font face="Verdana">Ok, now that we have our reference.&nbsp; Go
+double click on the command button and it should take you to the code window for
+Command1_Click.</font></small></p>
+<p><small><font face="Verdana">In there I want you to type what is listed here
+and not copy and paste.&nbsp; When you type you will see the Intellesense
+working for you and you should see why I want you to do it this way.&nbsp; Type:</font></small></p>
+<p><small><font face="Courier New" color="#000080"><small>Private Sub Command1_Click()<br>
+&nbsp;&nbsp;&nbsp; Dim s As COMUTIL.DISPLAY<br>
+&nbsp;&nbsp;&nbsp; Dim f As COMUTIL.DIALOG<br>
+&nbsp;&nbsp;&nbsp; Dim fNAME As String<br>
+&nbsp;&nbsp;&nbsp; fNAME = ""<br>
+&nbsp;&nbsp;&nbsp; Set f = New COMUTIL.DIALOG<br>
+&nbsp;&nbsp;&nbsp; f.VBGetSaveFileName fNAME, , , "*.bmp (Bitmap)|*.bmp", , CurDir, "Save to:", ".BMP"<br>
+&nbsp;&nbsp;&nbsp; Me.Refresh<br>
+&nbsp;&nbsp;&nbsp; If fNAME &lt;> "" Then<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Set s = New COMUTIL.DISPLAY<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; s.Capture Me.hWnd, fNAME<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MsgBox "The file was saved to: " &amp; s.FileName<br>
+&nbsp;&nbsp;&nbsp; End If<br>
+End Sub</small></font></small></p>
+<p><small><font face="Verdana">Ok, as you typed, you should of seen right on the
+first line when you said Dim s as (right here you got a drop down and COMUTIL
+was an option) then you pressed dot (.) and the dropdown showed you the Classes
+inside of our DLL (also all our public Enums but that is a different story
+again)</font></small></p>
+<p><font face="Verdana"><small>Then later as you typed when you started to use
+the S and F variables, pressing dot (.) brought up a list of Methods and
+Properties inside that class.&nbsp;&nbsp;&nbsp; Now I hope you see that your DLL
+has code that will work all by itself (because class modules should be coded
+that way) and that the code is </small><small>reusable</small><small> and
+available for any application to call.&nbsp; And because it is compiled up, you
+can distribute the functionality but retain the source to alter and enhance.</small></font></p>
+<p><small><font face="Verdana">There really is not too much to programming a
+DLL, it is more or less just understanding class modules.&nbsp; If you look at
+my other submissions I have a submission showing how to talk to a database using
+only class modules to talk to the data.&nbsp; If I wanted to I could take all
+those classes and put them in a new DLL project and compile them up, then remove
+them all from my previous project and reference the new DLL.&nbsp; With a few
+code tweaks, it would work again using the DLL, then for updates that were just
+database related, I would only have to update the DLL and not the EXE (depending
+on the change of course).</font></small></p>
+<p><small><font face="Verdana">Once again, feel free to comment or contact me
+with any question or comments.&nbsp; I am not sure this little tutorial is as
+good as my rest, but hey, somebody asked for it.</font></small></p>
+<p><font face="Verdana"><small>If you did all this, at least you now have a DLL
+that can do screen captures and also make calls for the Common Dialog
+control.&nbsp; Enjoy.</small></font></p>
+<p><small><font face="Verdana">-Clint LaFever<br>
+</font><a href="http://lafever.iscool.net"><font face="Verdana">http://lafever.iscool.net</font></a></small></p>
+<p>&nbsp;</p>
